@@ -11,21 +11,22 @@ def getMetainfoFileFromPath(path):
         rawMetainfo = metainfoFile.read()
         metainfo = bencode.bdecode(rawMetainfo)
     
-    if hasSingleFile(metainfo):
+    if isSingleFileMetainfo(metainfo):
         metainfo = makeMultipleFileMetainfoFromSingleFileMetainfo(metainfo)
     
     files = PayloadFile.getPayloadFilesFromMetainfo(metainfo)
     hashes = getHashesFromMetainfo(metainfo)
 
-def hasSingleFile(metainfo):
+def isSingleFileMetainfo(metainfo):
     return 'length' in metainfo['info'].keys()
 
 def makeMultipleFileMetainfoFromSingleFileMetainfo(metainfo):
-    path = [ metainfo['info']['name'] ]
+    alteredMetainfo = dict.copy(metainfo)
     length = metainfo['info']['length']
     
-    metainfo['info']['files'] = [ {'length': length, 'path': path} ]
-    return metainfo
+    alteredMetainfo['info']['files'] = [ {'length': length, 'path': []} ]
+    del metainfo
+    return alteredMetainfo
 
 def getHashesFromMetainfo(metainfo):
     concatenatedHashes = metainfo['info']['pieces']
