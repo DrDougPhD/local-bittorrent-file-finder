@@ -1,14 +1,14 @@
 import unittest
-import MetainfoFileHelper
+import BitTorrentMetainfoHelper
 from libLocalBFF import BitTorrentMetainfo
 
 class MetafileElaboratorUnitTest(unittest.TestCase):
     def testConcatenatedHashSplitByEvery20Characters(self):
         NUMBER_OF_HASHES = 3
         HASH_LENGTH = 20
-        sampleHashes = MetainfoFileHelper.generateHashList(NUMBER_OF_HASHES)
+        sampleHashes = BitTorrentMetainfoHelper.generateHashList(NUMBER_OF_HASHES)
         expectedHashes = sampleHashes[:]
-        hashString = MetainfoFileHelper.getConcatenatedHashesFromList(sampleHashes)
+        hashString = BitTorrentMetainfoHelper.getConcatenatedHashesFromList(sampleHashes)
         
         actualHashes = BitTorrentMetainfo.splitConcatenatedHashes(hashString)
         
@@ -17,7 +17,7 @@ class MetafileElaboratorUnitTest(unittest.TestCase):
         self.assertEqual(HASH_LENGTH, len(actualHashes[0]))
     
     def testFinalPieceSizeCorrectlyCalculatedFromMultiFileMetainfo(self):
-        helper = MetainfoFileHelper.MultiFileMetainfoFileHelper()
+        helper = BitTorrentMetainfoHelper.MultiFileMetainfoFileHelper()
         expectedFinalPieceSize = helper.finalPieceSize
         
         actualFinalPieceSize = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString()).getFinalPieceSize()
@@ -25,7 +25,7 @@ class MetafileElaboratorUnitTest(unittest.TestCase):
         self.assertEqual( expectedFinalPieceSize, actualFinalPieceSize )
         
     def testFinalPieceSizeCorrectlyCalculatedFromSingleFileMetainfo(self):
-        helper = MetainfoFileHelper.SingleFileMetainfoFileHelper()
+        helper = BitTorrentMetainfoHelper.SingleFileMetainfoFileHelper()
         expectedFinalPieceSize = helper.finalPieceSize
         
         actualFinalPieceSize = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString()).getFinalPieceSize()
@@ -33,7 +33,7 @@ class MetafileElaboratorUnitTest(unittest.TestCase):
         self.assertEqual( expectedFinalPieceSize, actualFinalPieceSize )
     
     def testPayloadSizeFromMultiFileBitTorrentMetainfo(self):
-        helper = MetainfoFileHelper.MultiFileMetainfoFileHelper()
+        helper = BitTorrentMetainfoHelper.MultiFileMetainfoFileHelper()
         expectedPayloadSize = helper.payloadSize
         
         actualPayloadSize = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString()).getPayloadSize()
@@ -41,7 +41,7 @@ class MetafileElaboratorUnitTest(unittest.TestCase):
         self.assertEqual( expectedPayloadSize, actualPayloadSize )
     
     def testPayloadSizeFromSingleFileBitTorrentMetainfo(self):
-        helper = MetainfoFileHelper.SingleFileMetainfoFileHelper()
+        helper = BitTorrentMetainfoHelper.SingleFileMetainfoFileHelper()
         expectedPayloadSize = helper.payloadSize
         
         actualPayloadSize = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString()).getPayloadSize()
@@ -49,7 +49,7 @@ class MetafileElaboratorUnitTest(unittest.TestCase):
         self.assertEqual( expectedPayloadSize, actualPayloadSize )
     
     def testNumberOfPiecesCalculatedFromMultiFileMetainfo(self):
-        helper = MetainfoFileHelper.MultiFileMetainfoFileHelper()
+        helper = BitTorrentMetainfoHelper.MultiFileMetainfoFileHelper()
         expectedNumberOfPieces = helper.numberOfPieces
         
         actualNumberOfPieces = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString()).getNumberOfPieces()
@@ -57,7 +57,7 @@ class MetafileElaboratorUnitTest(unittest.TestCase):
         self.assertEqual( expectedNumberOfPieces, actualNumberOfPieces )
         
     def testNumberOfPiecesCalculatedFromSingleFileMetainfo(self):
-        helper = MetainfoFileHelper.SingleFileMetainfoFileHelper()
+        helper = BitTorrentMetainfoHelper.SingleFileMetainfoFileHelper()
         expectedNumberOfPieces = helper.numberOfPieces
         
         actualNumberOfPieces = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString()).getNumberOfPieces()
