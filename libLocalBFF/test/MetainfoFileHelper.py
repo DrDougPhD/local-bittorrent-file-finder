@@ -3,14 +3,6 @@ import math
 import random
 from bencode import bencode
 
-def generateSampleSingleFileBencodedMetainfo():
-    metainfo = SingleFileMetainfoFileHelper()
-    return metainfo.getBencodedMetainfoString()
-
-def generateSampleMultiFileBencodedMetainfo():
-    metainfo = MultiFileMetainfoFileHelper()
-    return metainfo.getBencodedMetainfoString()
-
 class MetainfoFileHelper(object):
     def __init__(self, payloadLocation):
         self.pieceSize = generateRandomPieceSize()
@@ -22,7 +14,7 @@ class MetainfoFileHelper(object):
         
         self.payloadSize = generatePayloadSize(self.pieceSize, self.finalPieceSize, self.numberOfPieces)
         
-        self.creationDate = time.time()
+        self.creationDate = int(time.time())
         self.announceUrl = 'http://www.example.com/announce'
         self.payloadLocation = payloadLocation
         
@@ -75,7 +67,7 @@ def generateRandomFilesFromPayloadSize(payloadSize):
 def generateRandomPieceSize():
     TWO_KILOBYTES_POWER_OF_TWO = 11
     EIGHT_MEGABYTES_POWER_OF_TWO = 23
-    return math.pow(2, random.randint(TWO_KILOBYTES_POWER_OF_TWO, EIGHT_MEGABYTES_POWER_OF_TWO))
+    return int(math.pow(2, random.randint(TWO_KILOBYTES_POWER_OF_TWO, EIGHT_MEGABYTES_POWER_OF_TWO)))
 
 def generateRandomFinalPieceSize(pieceSize):
     return random.randint(0, pieceSize)
