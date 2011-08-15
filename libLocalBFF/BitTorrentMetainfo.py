@@ -34,20 +34,21 @@ class BitTorrentMetainfo(object):
         self.files = files
         self.pieceSize = pieceSize
         
-        self.payloadSize = self.getPayloadSize()
-        self.finalPieceSize = self.getFinalPieceSize()
+        self.payloadSize = self.__getPayloadSize()
+        self.finalPieceSize = self.__getFinalPieceSize()
+        self.numberOfPieces = self.__getNumberOfPieces()
     
-    def getPayloadSize(self):
+    def __getPayloadSize(self):
         totalSize = 0
         for f in self.files:
             totalSize += f.length
         
         return totalSize
 
-    def getFinalPieceSize(self):        
+    def __getFinalPieceSize(self):        
         return self.payloadSize % self.pieceSize
     
-    def getNumberOfPieces(self):
+    def __getNumberOfPieces(self):
         return int(math.ceil(float(self.payloadSize)/self.pieceSize))
 
 def isSingleFileMetainfo(metainfo):

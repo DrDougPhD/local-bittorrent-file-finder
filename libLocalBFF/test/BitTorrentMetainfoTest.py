@@ -3,6 +3,9 @@ import BitTorrentMetainfoHelper
 from libLocalBFF import BitTorrentMetainfo
 
 class MetafileElaboratorUnitTest(unittest.TestCase):
+    def testSmoke(self):
+        metainfo = BitTorrentMetainfo.BitTorrentMetainfo(files=None, pieceSize=None)
+    
     def testConcatenatedHashSplitByEvery20Characters(self):
         NUMBER_OF_HASHES = 3
         HASH_LENGTH = 20
