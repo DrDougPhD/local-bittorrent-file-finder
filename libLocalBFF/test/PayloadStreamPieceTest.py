@@ -14,7 +14,7 @@ class PayloadStreamPieceUnitTest(unittest.TestCase):
         
         piece = PayloadStreamSegment.PayloadStreamPiece(size=SAMPLE_PIECE_SIZE, index=SAMPLE_PIECE_INDEX)
         
-        actualBeginningPayloadStreamOffset = piece.beginningPayloadStreamOffset
+        actualBeginningPayloadStreamOffset = piece.streamOffset
         self.assertEqual(expectedBeginningPayloadStreamOffset, actualBeginningPayloadStreamOffset)
     
     def testEndingPayloadStreamOffsetOfPieceCalculated(self):
@@ -24,7 +24,7 @@ class PayloadStreamPieceUnitTest(unittest.TestCase):
         
         piece = PayloadStreamSegment.PayloadStreamPiece(size=SAMPLE_PIECE_SIZE, index=SAMPLE_PIECE_INDEX)
         
-        actualEndingPayloadStreamOffset = piece.endingPayloadStreamOffset
+        actualEndingPayloadStreamOffset = piece.endingStreamOffset
         self.assertEqual(expectedEndingPayloadStreamOffset, actualEndingPayloadStreamOffset)
 
 

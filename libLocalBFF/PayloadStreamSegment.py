@@ -7,12 +7,12 @@ class PayloadStreamPiece(PayloadStreamSegment):
     def __init__(self, size, index):
         PayloadStreamSegment.__init__(self, size=size, index=index)
         
-        self.beginningPayloadStreamOffset = index * size
-        self.endingPayloadStreamOffset = (index+1) * size
+        self.streamOffset = index * size
+        self.endingStreamOffset = (index+1) * size
 
 class PayloadStreamFile(PayloadStreamSegment):
-    def __init__(self, size, index, beginningPayloadStreamOffset):
+    def __init__(self, size, index, streamOffset):
         PayloadStreamSegment.__init__(self, size=size, index=index)
         
-        self.beginningPayloadStreamOffset = beginningPayloadStreamOffset
-        self.endingPayloadStreamOffset = beginningPayloadStreamOffset + size
+        self.streamOffset = streamOffset
+        self.endingPayloadStreamOffset = streamOffset + size
