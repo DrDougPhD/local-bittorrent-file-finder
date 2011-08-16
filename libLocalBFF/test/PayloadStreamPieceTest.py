@@ -3,7 +3,7 @@ from libLocalBFF import PayloadStreamSegment
 from libLocalBFF.test import BitTorrentMetainfoHelper
 
 
-class PayloadStreamPieceTest(unittest.TestCase):
+class PayloadStreamPieceUnitTest(unittest.TestCase):
     def testSmoke(self):
         piece = PayloadStreamSegment.PayloadStreamPiece(size=13, index=0)
     

@@ -70,7 +70,7 @@ def generateRandomPieceSize():
     return int(math.pow(2, random.randint(TWO_KILOBYTES_POWER_OF_TWO, EIGHT_MEGABYTES_POWER_OF_TWO)))
 
 def generateRandomFinalPieceSize(pieceSize):
-    return random.randint(0, pieceSize)
+    return random.randint(1, pieceSize+1)
 
 def generateRandomNumberOfPieces():
     return random.randint(3, 15)
