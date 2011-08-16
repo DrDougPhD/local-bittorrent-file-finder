@@ -1,18 +1,13 @@
 import math
 from bencode import bencode
-from PayloadFile import PayloadFile
+from libLocalBFF import PayloadStreamSegment
 
 def getBitTorrentMetainfoFromBencodedString(metainfo):
     metainfoDict = bencode.bdecode(metainfo)
     
     pieceSize = metainfoDict['info']['piece length']
     
-    payloadFiles = []
-    if isSingleFileMetainfo(metainfoDict):
-        payloadFiles.append( PayloadFile(path=metainfoDict['info']['name'], length=metainfoDict['info']['length']) )
-    else:
-        for f in metainfoDict['info']['files']:
-            payloadFiles.append( PayloadFile( path = metainfoDict['info']['name'] + "/" + "/".join(f['path']), length=f['length'] ))
+    payloadFiles = PayloadStreamSegment.getPayloadStreamFilesFromMetainfo(metainfo=metainfoDict)
     
     return BitTorrentMetainfo(files=payloadFiles, pieceSize=pieceSize)
 
@@ -41,7 +36,7 @@ class BitTorrentMetainfo(object):
     def __getPayloadSize(self):
         totalSize = 0
         for f in self.files:
-            totalSize += f.length
+            totalSize += f.size
         
         return totalSize
 
@@ -51,16 +46,13 @@ class BitTorrentMetainfo(object):
     def __getNumberOfPieces(self):
         return int(math.ceil(float(self.payloadSize)/self.pieceSize))
 
-def isSingleFileMetainfo(metainfo):
-    return 'length' in metainfo['info'].keys()
-
-def makeMultipleFileMetainfoFromSingleFileMetainfo(metainfo):
-    alteredMetainfo = dict.copy(metainfo)
-    length = metainfo['info']['length']
-    
-    alteredMetainfo['info']['files'] = [ {'length': length, 'path': []} ]
-    del metainfo
-    return alteredMetainfo
+#def makeMultipleFileMetainfoFromSingleFileMetainfo(metainfo):
+#    alteredMetainfo = dict.copy(metainfo)
+#    length = metainfo['info']['length']
+#    
+#    alteredMetainfo['info']['files'] = [ {'length': length, 'path': []} ]
+#    del metainfo
+#    return alteredMetainfo
 
 def getHashesFromMetainfo(metainfo):
     concatenatedHashes = metainfo['info']['pieces']

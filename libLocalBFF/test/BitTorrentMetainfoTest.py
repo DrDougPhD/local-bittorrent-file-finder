@@ -1,6 +1,7 @@
 import unittest
 import BitTorrentMetainfoHelper
 from libLocalBFF import BitTorrentMetainfo
+from random import randint
 
 class MetafileElaboratorUnitTest(unittest.TestCase):
     def testSmoke(self):
@@ -66,6 +67,20 @@ class MetafileElaboratorUnitTest(unittest.TestCase):
         actualNumberOfPieces = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString()).numberOfPieces
         
         self.assertEqual( expectedNumberOfPieces, actualNumberOfPieces )
+    
+    def testFilesPopulatedOnSingleFileMetainfo(self):
+        STARTING_BYTE_LOCATION = 0
+        helper = BitTorrentMetainfoHelper.SingleFileMetainfoFileHelper()
+        expectedStreamOffsetAtEndOfFile = helper.payloadSize
+        expectedStreamOffset = STARTING_BYTE_LOCATION
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        actualStreamOffset = metainfo.files[0].streamOffset
+        actualStreamOffsetAtEndOfFile = metainfo.files[0].endingStreamOffset
+        
+        self.assertEqual( expectedStreamOffset, actualStreamOffset )
+        self.assertEqual( expectedStreamOffsetAtEndOfFile, actualStreamOffsetAtEndOfFile )
+        
         
         
 if __name__ == '__main__':
