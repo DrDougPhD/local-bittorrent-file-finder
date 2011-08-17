@@ -42,7 +42,8 @@ class MultiFileMetainfoFileHelper(MetainfoFileHelper):
         MetainfoFileHelper.__init__(self, payloadLocation='topLevelDirectory')
         
         self.files = generateRandomFilesFromPayloadSize(self.payloadSize)
-        self.dict['info']['files'] = self.files 
+        self.dict['info']['files'] = self.files
+        self.numberOfFiles = len(self.files)
 
 
 def generateRandomFilesFromPayloadSize(payloadSize):

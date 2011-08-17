@@ -80,8 +80,39 @@ class MetafileElaboratorUnitTest(unittest.TestCase):
         
         self.assertEqual( expectedStreamOffset, actualStreamOffset )
         self.assertEqual( expectedStreamOffsetAtEndOfFile, actualStreamOffsetAtEndOfFile )
+    
+    def testNumberOfFilesPopulatedOnMultiFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.MultiFileMetainfoFileHelper()
+        expectedNumberOfFiles = helper.numberOfFiles
         
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        actualNumberOfFiles = len(metainfo.files)
         
+        self.assertEqual( expectedNumberOfFiles, actualNumberOfFiles )
+    
+    def testFileSizesMatchUpOnMultiFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.MultiFileMetainfoFileHelper()
+        numberOfFiles = helper.numberOfFiles
         
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        for i in range(numberOfFiles):
+            expectedCurrentFileSize = helper.files[i]['length']
+            actualCurrentFileSize = metainfo.files[i].size
+            self.assertEqual( expectedCurrentFileSize, actualCurrentFileSize )
+    
+    def testFileOffsetsMatchOnMultiFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.MultiFileMetainfoFileHelper()
+        numberOfFiles = helper.numberOfFiles
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        expectedStreamOffset = 0
+        actualStreamOffset = 0
+        for i in range(numberOfFiles):
+            actualStreamOffset = metainfo.files[i].streamOffset
+            self.assertEqual( expectedStreamOffset, actualStreamOffset )
+            expectedStreamOffset += helper.files[i]['length']
+                
 if __name__ == '__main__':
     unittest.main()
