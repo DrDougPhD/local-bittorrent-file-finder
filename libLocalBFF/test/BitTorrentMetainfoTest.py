@@ -5,7 +5,7 @@ from random import randint
 
 class MetafileElaboratorUnitTest(unittest.TestCase):
     def testSmoke(self):
-        metainfo = BitTorrentMetainfo.BitTorrentMetainfo(files=[], pieceSize=2)
+        metainfo = BitTorrentMetainfo.BitTorrentMetainfo(files=[], pieceSize=2, pieces=None)
             
     def testConcatenatedHashSplitByEvery20Characters(self):
         NUMBER_OF_HASHES = 3
@@ -108,11 +108,162 @@ class MetafileElaboratorUnitTest(unittest.TestCase):
         metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
         
         expectedStreamOffset = 0
-        actualStreamOffset = 0
         for i in range(numberOfFiles):
             actualStreamOffset = metainfo.files[i].streamOffset
             self.assertEqual( expectedStreamOffset, actualStreamOffset )
             expectedStreamOffset += helper.files[i]['length']
-                
+    
+    def testFileEndingOffsetsMatchOnMultiFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.MultiFileMetainfoFileHelper()
+        numberOfFiles = helper.numberOfFiles
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        expectedEndingStreamOffset = 0
+        for i in range(numberOfFiles):
+            expectedEndingStreamOffset += helper.files[i]['length']
+            actualEndingStreamOffset = metainfo.files[i].endingStreamOffset
+            self.assertEqual( expectedEndingStreamOffset, actualEndingStreamOffset )
+            
+    def testPieceSizesMatchUpOnSingleFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.SingleFileMetainfoFileHelper() 
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        expectedPieceSize = helper.pieceSize
+        actualPieceSize = metainfo.pieceSize
+        self.assertEqual( expectedPieceSize, actualPieceSize )
+        
+        numberOfPieces = helper.numberOfPieces
+        for pieceIndex in range(numberOfPieces-1):
+            expectedPieceSize = helper.pieceSize
+            actualPieceSize = metainfo.pieces[pieceIndex].size
+            self.assertEqual( expectedPieceSize, actualPieceSize )
+        
+    def testPieceSizesMatchUpOnMultiFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.MultiFileMetainfoFileHelper() 
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        expectedPieceSize = helper.pieceSize
+        actualPieceSize = metainfo.pieceSize
+        self.assertEqual( expectedPieceSize, actualPieceSize )
+        
+        numberOfPieces = helper.numberOfPieces
+        for pieceIndex in range(numberOfPieces-1):
+            expectedPieceSize = helper.pieceSize
+            actualPieceSize = metainfo.pieces[pieceIndex].size
+            self.assertEqual( expectedPieceSize, actualPieceSize )
+    
+    def testFinalPieceSizesMatchUpOnSingleFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.SingleFileMetainfoFileHelper() 
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        expectedFinalPieceSize = helper.finalPieceSize
+        actualFinalPieceSize = metainfo.finalPieceSize
+        self.assertEqual(expectedFinalPieceSize, actualFinalPieceSize)
+        
+        expectedFinalPieceSize = helper.finalPieceSize
+        actualFinalPieceSize = metainfo.pieces[-1].size
+        self.assertEqual(expectedFinalPieceSize, actualFinalPieceSize)
+        
+    def testFinalPieceSizesMatchUpOnMultiFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.MultiFileMetainfoFileHelper() 
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        expectedFinalPieceSize = helper.finalPieceSize
+        actualFinalPieceSize = metainfo.finalPieceSize
+        self.assertEqual(expectedFinalPieceSize, actualFinalPieceSize)
+        
+        expectedFinalPieceSize = helper.finalPieceSize
+        actualFinalPieceSize = metainfo.pieces[-1].size
+        self.assertEqual(expectedFinalPieceSize, actualFinalPieceSize)
+    
+    def testPieceOffsetForAllPiecesFromSingleFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.SingleFileMetainfoFileHelper() 
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        pieceSize = helper.pieceSize
+        numberOfPieces = helper.numberOfPieces
+        expectedStreamOffsetOfCurrentPiece = 0
+        for pieceIndex in range(numberOfPieces):
+            actualStreamOffsetOfCurrentPiece = metainfo.pieces[pieceIndex].streamOffset
+            self.assertEqual( expectedStreamOffsetOfCurrentPiece, actualStreamOffsetOfCurrentPiece )
+            expectedStreamOffsetOfCurrentPiece += pieceSize
+    
+    def testPieceOffsetForAllPiecesFromMultiFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.MultiFileMetainfoFileHelper() 
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        pieceSize = helper.pieceSize
+        numberOfPieces = helper.numberOfPieces
+        expectedStreamOffsetOfCurrentPiece = 0
+        for pieceIndex in range(numberOfPieces):
+            actualStreamOffsetOfCurrentPiece = metainfo.pieces[pieceIndex].streamOffset
+            self.assertEqual( expectedStreamOffsetOfCurrentPiece, actualStreamOffsetOfCurrentPiece )
+            expectedStreamOffsetOfCurrentPiece += pieceSize
+    
+    def testPieceEndingOffsetForAllPiecesFromSingleFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.SingleFileMetainfoFileHelper() 
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        pieceSize = helper.pieceSize
+        payloadSize = helper.payloadSize
+        
+        numberOfPieces = helper.numberOfPieces
+        expectedEndingStreamOffsetOfCurrentPiece = 0
+        for pieceIndex in range(numberOfPieces-1):
+            expectedEndingStreamOffsetOfCurrentPiece += pieceSize
+            actualEndingStreamOffsetOfCurrentPiece = metainfo.pieces[pieceIndex].endingStreamOffset
+            self.assertEqual( expectedEndingStreamOffsetOfCurrentPiece, actualEndingStreamOffsetOfCurrentPiece )
+        expectedEndingStreamOffsetOfCurrentPiece = payloadSize
+        actualEndingStreamOffsetOfCurrentPiece = metainfo.pieces[-1].endingStreamOffset
+        self.assertEqual( expectedEndingStreamOffsetOfCurrentPiece, actualEndingStreamOffsetOfCurrentPiece )
+    
+    def testPieceEndingOffsetForAllPiecesFromMultiFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.MultiFileMetainfoFileHelper() 
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        pieceSize = helper.pieceSize
+        payloadSize = helper.payloadSize
+        
+        numberOfPieces = helper.numberOfPieces
+        expectedEndingStreamOffsetOfCurrentPiece = 0
+        for pieceIndex in range(numberOfPieces-1):
+            expectedEndingStreamOffsetOfCurrentPiece += pieceSize
+            actualEndingStreamOffsetOfCurrentPiece = metainfo.pieces[pieceIndex].endingStreamOffset
+            self.assertEqual( expectedEndingStreamOffsetOfCurrentPiece, actualEndingStreamOffsetOfCurrentPiece )
+        expectedEndingStreamOffsetOfCurrentPiece = payloadSize
+        actualEndingStreamOffsetOfCurrentPiece = metainfo.pieces[-1].endingStreamOffset
+        self.assertEqual( expectedEndingStreamOffsetOfCurrentPiece, actualEndingStreamOffsetOfCurrentPiece )
+    
+    def testHashOfEachPieceFromSingleFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.SingleFileMetainfoFileHelper() 
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        numberOfPieces = helper.numberOfPieces
+        for pieceIndex in range(numberOfPieces):
+            expectedHash = helper.hashes[pieceIndex]
+            actualHash = metainfo.pieces[pieceIndex].hash
+            self.assertEqual( expectedHash, actualHash )
+            
+    def testHashOfEachPieceFromMultiFileMetainfo(self):
+        helper = BitTorrentMetainfoHelper.MultiFileMetainfoFileHelper() 
+        
+        metainfo = BitTorrentMetainfo.getBitTorrentMetainfoFromBencodedString(helper.getBencodedMetainfoString())
+        
+        numberOfPieces = helper.numberOfPieces
+        for pieceIndex in range(numberOfPieces):
+            expectedHash = helper.hashes[pieceIndex]
+            actualHash = metainfo.pieces[pieceIndex].hash
+            self.assertEqual( expectedHash, actualHash )
+    
 if __name__ == '__main__':
     unittest.main()

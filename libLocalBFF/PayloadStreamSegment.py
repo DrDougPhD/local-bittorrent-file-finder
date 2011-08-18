@@ -32,9 +32,10 @@ class PayloadStreamSegment(object):
         self.index = index
 
 class PayloadStreamPiece(PayloadStreamSegment):
-    def __init__(self, size, index):
+    def __init__(self, size, index, hash):
         PayloadStreamSegment.__init__(self, size=size, index=index)
         
+        self.hash = hash
         self.streamOffset = index * size
         self.endingStreamOffset = (index+1) * size
 
