@@ -22,8 +22,8 @@ for piece in metafile.pieces:
         
         for possibleMatchedFile in possibleMatches:
           if piece.isMatchedTo( possibleMatchedFile ):
-            piece.file.matchedFile = possibleMatchedFile          
+            piece.file.matchedFilePath = possibleMatchedFile          
 
 print "Match info:"
-for metafile in metafile.files:
-  print metafile.path + "\t->\t" + metafile.matchedFile
+for payloadFile in metafile.files:
+  print payloadFile.path + "\t->\t" + payloadFile.matchedFilePath

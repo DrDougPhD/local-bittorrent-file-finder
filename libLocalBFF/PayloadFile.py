@@ -33,7 +33,7 @@ class PayloadFile:
     self.path = path
     self.size = size
     self.streamOffset = streamOffset
-    self.matchedFile = None
+    self.matchedFilePath = None
     self.status = "NOT_CHECKED"
   
   def contributesTo(self, piece):   
@@ -43,4 +43,4 @@ class PayloadFile:
     return ( self.streamOffset <= piece.streamOffset and fileEndingOffset >= pieceEndingOffset )
   
   def hasNotBeenMatched(self):
-    return not bool( self.matchedFile )
+    return not bool( self.matchedFilePath )
