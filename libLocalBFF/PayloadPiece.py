@@ -1,24 +1,23 @@
 import utils
-from hashlib import sha1
+import FileContributingToPiece
+from AllContributingFilesToPiece import AllContributingFilesToPiece
 
 def getPiecesFromMetafileDict( metafileDict ):
   payloadSize = getPayloadSizeFromMetafileDict(metafileDict)
   
   hashes = getHashesFromMetafileDict(metafileDict)
   
-  pieceSize = metafileDict['info']['piece length']
-  finalPieceSize = payloadSize % pieceSize
+  pieceSize = getPieceSizeFromDict(metafileDict)
+  finalPieceSize = getFinalPieceSizeFromDict(metafileDict)
   
   pieces = []
   streamOffset = 0
-  numberOfPieces = len(hashes)
+  numberOfPieces = getNumberOfPiecesFromDict(metafileDict)
   for pieceIndex in range(numberOfPieces-1):
       pieces.append( PayloadPiece(size=pieceSize, hash=hashes[pieceIndex], streamOffset=streamOffset) )
       streamOffset += pieceSize
   
-  finalPiece = PayloadPiece(size=finalPieceSize, hash=hashes[-1])
-  finalPiece.size = finalPieceSize
-  finalPiece.streamOffset = pieceSize * (numberOfPieces-1)
+  finalPiece = PayloadPiece(size=finalPieceSize, hash=hashes[-1], streamOffset=streamOffset)
   pieces.append(finalPiece)
   
   return pieces
@@ -41,24 +40,28 @@ def splitConcatenatedHashes(concatenatedHashes):
   SHA1_HASH_LENGTH = 20
   return [concatenatedHashes[start:start+SHA1_HASH_LENGTH] for start in range(0, len(concatenatedHashes), SHA1_HASH_LENGTH)]
 
+def getPieceSizeFromDict(metafileDict):
+  return metafileDict['info']['piece length']
+
+def getFinalPieceSizeFromDict(metafileDict):
+  return getPayloadSizeFromMetafileDict(metafileDict) % getPieceSizeFromDict(metafileDict)
+
+def getNumberOfPiecesFromDict(metafileDict):
+  return len(getHashesFromMetafileDict(metafileDict))
+
 class PayloadPiece:
-  def __init__(self, size=None, hash=None, streamOffset=None):
+  def __init__(self, size, streamOffset, hash):
     self.size = size
-    self.hash = hash
     self.streamOffset = streamOffset
-    self.file = None
+    self.endingOffset = streamOffset+size
+    self.hash = hash
+    self.contributingFiles = AllContributingFilesToPiece()
   
-  def isMatchedTo( self, possibleMatchedFile ):
-    pieceData = self.getDataFromFile( possibleMatchedFile )
-    computedHash = sha1( pieceData )
-    
-    return self.hash == computedHash.digest()
+  def setContributingFilesFromAllFiles(self, allFiles):    
+    for payloadFile in allFiles:
+      if payloadFile.contributesTo(self):
+        contributingFile = FileContributingToPiece.getFromMetafilePieceAndFileObjects(piece=self, file=payloadFile)
+        self.contributingFiles.addContributingFile( contributingFile )
   
-  def getDataFromFile( self, possibleMatchedFile ):
-    pieceOffsetInFile = self.streamOffset - self.file.streamOffset
-    pieceData = None
-    with open( possibleMatchedFile, 'rb+' ) as possibleFile:
-      possibleFile.seek( pieceOffsetInFile )
-      pieceData = possibleFile.read( self.size )
-    
-    return pieceData
+  def findMatch(self):
+    self.contributingFiles.findCombinationThatMatchesReferenceHash( hash=self.hash )

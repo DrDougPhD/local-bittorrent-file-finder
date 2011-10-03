@@ -13,13 +13,27 @@ def getMetafileFromBencodedData( bencodedData ):
   return getMetafileFromDict( metainfoDict )
 
 def getMetafileFromDict( metafileDict ):
-  metafile = BitTorrentMetafile()
-  metafile.files = PayloadFile.getPayloadFilesFromMetafileDict( metafileDict )
-  metafile.pieces = PayloadPiece.getPiecesFromMetafileDict( metafileDict )
+  files = PayloadFile.getPayloadFilesFromMetafileDict( metafileDict )
+  pieces = PayloadPiece.getPiecesFromMetafileDict( metafileDict )
+  pieceSize = PayloadPiece.getPieceSizeFromDict(metafileDict)
+  finalPieceSize = PayloadPiece.getFinalPieceSizeFromDict(metafileDict)
+  numberOfPieces = PayloadPiece.getNumberOfPiecesFromDict(metafileDict)
+  payloadSize = PayloadPiece.getPayloadSizeFromMetafileDict( metafileDict )
+  
+  metafile = BitTorrentMetafile(files=files, pieces=pieces, pieceSize=pieceSize, finalPieceSize=finalPieceSize, numberOfPieces=numberOfPieces, payloadSize=payloadSize)
   
   return metafile
 
 class BitTorrentMetafile:
-  def __init__(self, files=None, pieces=None):
+  def __init__(self, files, pieces, pieceSize=None, finalPieceSize=None, numberOfPieces=None, payloadSize=None):
     self.files = files
     self.pieces = pieces
+    self.pieceSize = pieceSize
+    self.finalPieceSize = finalPieceSize
+    self.numberOfPieces = numberOfPieces
+    self.payloadSize = payloadSize
+    
+    self.numberOfFiles = len(files)
+    
+    for piece in self.pieces:
+      piece.setContributingFilesFromAllFiles(self.files)

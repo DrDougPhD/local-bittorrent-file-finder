@@ -1,29 +1,35 @@
 import sys
-
-from libLocalBFF import BitTorrentMetafile
-from libLocalBFF import ContentDirectoryDao
+from libLocalBFF.LocalBitTorrentFileFinder import LocalBitTorrentFileFinder
 
 metafilePath = sys.argv[1]
 contentDirectory = sys.argv[2]
+service = LocalBitTorrentFileFinder( metafilePath=metafilePath, contentDirectory=contentDirectory )
 
-metafile = BitTorrentMetafile.getMetafileFromPath(metafilePath)
-contentDao = ContentDirectoryDao.getAllFilesInContentDirectory(contentDirectory)
+print "Stage 1: Processing metainfo file..."
+print ""
+service.processMetafile()
+print "Number of Files:\t" + str(service.metafile.numberOfFiles)
+print "Payload size:\t\t" + str(service.metafile.payloadSize)
+print "Number of Pieces:\t" + str(service.metafile.numberOfPieces)
+print "Piece size:\t\t" + str(service.metafile.pieceSize)
+print "Final piece size:\t" + str(service.metafile.finalPieceSize)
+print ""
+print "File descriptions:"
+for f in service.metafile.files:
+  print "\tPath:\t"+ f.path
+  print "\tSize:\t"+ str(f.size)
+  print "-"*20
 
-print "Files:\t" + str(len( metafile.files ))
-print "Pieces:\t" + str(len( metafile.pieces ))
+print "Stage 2: Walking content directory..."
+print ""
+service.gatherAllFilesFromContentDirectory()
 
-for piece in metafile.pieces:
-  for payloadfile in metafile.files:
-    if payloadfile.hasNotBeenMatched():
-      if payloadfile.contributesTo(piece):
-        piece.beginningOffsetInFile = piece.streamOffset - payloadfile.streamOffset
-        piece.file = payloadfile
-        possibleMatches = contentDao.getAllFilesOfSize( payloadfile.size )
-        
-        for possibleMatchedFile in possibleMatches:
-          if piece.isMatchedTo( possibleMatchedFile ):
-            piece.file.matchedFilePath = possibleMatchedFile          
+print "Stage 3: Finding all file system files that match by size..."
+print "#"*40
+service.connectFilesInMetafileToPossibleMatchesInContentDirectory()
 
-print "Match info:"
-for payloadFile in metafile.files:
-  print payloadFile.path + "\t->\t" + payloadFile.matchedFilePath
+print "Stage 4: Matching files in the file system to files in metafile..."
+service.positivelyMatchFilesInMetafileToPossibleMatches()
+
+for matchedFile in service.files:
+  print matchedFile.getPathFromMetafile() + "\t->\t" + matchedFile.getMatchedPathFromContentDirectory()
