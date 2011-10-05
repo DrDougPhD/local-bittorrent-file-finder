@@ -20,12 +20,12 @@ class LocalBitTorrentFileFinder:
     self.files = self.metafile.files
     
     for payloadFile in self.files:
-      print "File:\t\t\t" + payloadFile.path
-      print "Size:\t\t\t" + str(payloadFile.size)
+#      print "File:\t\t\t" + payloadFile.path
+#      print "Size:\t\t\t" + str(payloadFile.size)
 
       payloadFile.possibleMatches = self.dao.getAllFilesOfSize( payloadFile.size )
-      print "Possible matches:\t" + str(len(payloadFile.possibleMatches))
-      print "#"*40
+#      print "Possible matches:\t" + str(len(payloadFile.possibleMatches))
+#      print "#"*40
       
   def gatherAllFilesFromContentDirectory(self):
     self.dao = ContentDirectoryDao.getAllFilesInContentDirectory(self.contentDirectory)

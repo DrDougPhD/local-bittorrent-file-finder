@@ -8,23 +8,23 @@ def getFromMetafilePieceAndFileObjects(piece, file):
   byteInWhichFileBeginsInPiece = None
   
   if pieceOnlyHasOneFile(piece, file):
-    print "Piece only has one file"
+#    print "Piece only has one file"
     byteInWhichFileBeginsInPiece = piece.streamOffset - file.streamOffset
     byteInWhichFileEndsInPiece = piece.size
   elif fileBeginsBeforePieceAndEndsInsidePiece(piece, file):
-    print "File begins before piece and ends inside piece"
+#    print "File begins before piece and ends inside piece"
     byteInWhichFileBeginsInPiece = piece.streamOffset - file.streamOffset
-    byteInWhichFileEndsInPiece = file.size - file.streamOffset
+    byteInWhichFileEndsInPiece = file.endingOffset - piece.streamOffset
   elif fileBeginsInsidePieceAndEndsAfterPieceEnds(piece, file):
-    print "File begins inside of piece and ends after piece ends"
+#    print "File begins inside of piece and ends after piece ends"
     byteInWhichFileBeginsInPiece = 0
     byteInWhichFileEndsInPiece = piece.endingOffset - file.streamOffset
   elif fileIsCompletelyHeldInsidePiece(piece, file):
-    print "Entire file is held within piece"
+#    print "Entire file is held within piece"
     byteInWhichFileBeginsInPiece = 0
     byteInWhichFileEndsInPiece = file.size
-    print "File reference points: "
-    print (byteInWhichFileBeginsInPiece, byteInWhichFileEndsInPiece)
+#    print "File reference points: "
+#    print (byteInWhichFileBeginsInPiece, byteInWhichFileEndsInPiece)
   else:
     raise Exception
   
@@ -46,7 +46,7 @@ class FileContributingToPiece:
   
   def getData(self):
     data = ''
-    print "(Offset: " + str(self.seekOffset) + ", Size: " + str(self.readOffset) + ")"
+#    print "(Offset: " + str(self.seekOffset) + ", Size: " + str(self.readOffset) + ")"
     
     with open(self.possibleMatchPath, 'rb+') as possibleMatchedFile:
       possibleMatchedFile.seek(self.seekOffset)
