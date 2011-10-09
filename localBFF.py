@@ -1,36 +1,29 @@
 import sys
+import logging
 from libLocalBFF.LocalBitTorrentFileFinder import LocalBitTorrentFileFinder
 
 metafilePath = sys.argv[1]
 contentDirectory = sys.argv[2]
+logging.basicConfig(filename='ex.log',level=logging.DEBUG)
+
 service = LocalBitTorrentFileFinder( metafilePath=metafilePath, contentDirectory=contentDirectory )
 
-print "Stage 1: Processing metainfo file..."
-print "#"*40
 service.processMetafile()
-print "Number of Files:\t" + str(service.metafile.numberOfFiles)
-print "Payload size:\t\t" + str(service.metafile.payloadSize)
-print "Number of Pieces:\t" + str(service.metafile.numberOfPieces)
-print "Piece size:\t\t" + str(service.metafile.pieceSize)
-print "Final piece size:\t" + str(service.metafile.finalPieceSize)
-print ""
-print "File descriptions:"
-for f in service.metafile.files:
-  print "\tPath:\t"+ f.path
-  print "\tSize:\t"+ str(f.size)
-  print "-"*40
 
-print "Stage 2: Walking content directory..."
-print "#"*40
 service.gatherAllFilesFromContentDirectory()
 
-print "Stage 3: Finding all file system files that match by size..."
-print "#"*40
 service.connectFilesInMetafileToPossibleMatchesInContentDirectory()
 
-print "Stage 4: Matching files in the file system to files in metafile..."
-print "#"*40
 service.positivelyMatchFilesInMetafileToPossibleMatches()
 
 for matchedFile in service.files:
-  print matchedFile.getPathFromMetafile() + "\t->\t" + matchedFile.getMatchedPathFromContentDirectory()
+  output = ""
+  
+  if matchedFile.status == 'NOT_CHECKED':
+    output = "File not checked"
+  elif matchedFile.status == 'MATCH_FOUND':
+    output = matchedFile.getMatchedPathFromContentDirectory()
+  elif matchedFile.status == 'CHECKED_WITH_NO_MATCH':
+    output = "No matches found"
+  
+  print matchedFile.getPathFromMetafile() + "\t->\t" + output
