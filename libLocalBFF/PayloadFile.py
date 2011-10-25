@@ -1,4 +1,5 @@
 import utils
+import os
 
 def getPayloadFilesFromMetafileDict(metafileDict):
   files = []
@@ -17,20 +18,23 @@ def getPayloadFilesFromMetafileDict(metafileDict):
     currentStreamOffset = 0
     for i in range(0, numberOfFiles):
       currentFile = metafileDict['info']['files'][i]
-      path = payloadDirectory + '/' + '/'.join(currentFile['path'])
+      path = os.path.join(payloadDirectory, *currentFile['path'][:-1])
+      filename = currentFile['path'][-1]
+#      path = payloadDirectory + '/' + '/'.join(currentFile['path'])
       size = currentFile['length']
       index = i
       streamOffset = currentStreamOffset
       
-      files.append( PayloadFile(path=path, size=size, streamOffset=streamOffset) )
+      files.append( PayloadFile(path=path, filename=filename, size=size, streamOffset=streamOffset) )
       
       currentStreamOffset += size
   
   return files
 
 class PayloadFile:
-  def __init__(self, path, size, streamOffset):
+  def __init__(self, path, filename, size, streamOffset):
     self.path = path
+    self.filename = filename
     self.size = size
     self.streamOffset = streamOffset
     self.endingOffset = streamOffset+size
@@ -70,7 +74,7 @@ class PayloadFile:
     return not bool( self.matchedFilePath )
   
   def getPathFromMetafile(self):
-    return self.path
+    return os.path.join(self.path, self.filename)
   
   def getMatchedPathFromContentDirectory(self):
     return self.matchedFilePath
