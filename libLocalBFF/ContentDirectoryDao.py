@@ -1,16 +1,28 @@
 import os
 import sqlite3
+import logging
 
 def getAllFilesInContentDirectory( contentDirectory ):
   fileInfoFromContentDirectory = []
   for root, dirs, files in os.walk( contentDirectory ):
     for f in files:
-      filepath = os.path.join( root, f )
-      filesize = os.path.getsize( filepath )
-      absolutePath = os.path.abspath( root )
+      filepath = os.path.join( os.path.abspath(root), f )
       
-      fileInfo = (unicode(absolutePath, errors='replace'), unicode(f, errors='replace'), filesize)
-      fileInfoFromContentDirectory.append( fileInfo )
+      if os.path.exists( filepath ):
+        filesize = os.path.getsize( filepath )
+        absolutePath = os.path.abspath( root )
+        
+        fileInfo = (unicode(absolutePath, errors='replace'), unicode(f, errors='replace'), filesize)
+        fileInfoFromContentDirectory.append( fileInfo )
+      else:
+        logging.error("Problem with accessing file -> " + filepath)
+      
+      # Errors if the file is a broken link.
+#      filesize = os.path.getsize( filepath )
+#      absolutePath = os.path.abspath( root )
+#      
+#      fileInfo = (unicode(absolutePath, errors='replace'), unicode(f, errors='replace'), filesize)
+#      fileInfoFromContentDirectory.append( fileInfo )
   
   dao = ContentDirectoryDao(files=fileInfoFromContentDirectory)
   
