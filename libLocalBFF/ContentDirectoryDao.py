@@ -59,10 +59,10 @@ class ContentDirectoryDao:
     logging.debug("All files of size " + str(size) + " bytes -> " + str(len(filesWithSpecifiedSize)))
     filenames = []
     for fileInfoRow in filesWithSpecifiedSize:
-      logging.debug("File: " + filepath)
       fileDirectory = fileInfoRow[0]
       filename = fileInfoRow[1]
       filepath = os.path.join(fileDirectory, filename)
+      logging.debug("File: " + filepath)
       filenames.append( filepath )
     
     return filenames
