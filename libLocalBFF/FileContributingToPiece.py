@@ -48,7 +48,7 @@ class FileContributingToPiece:
     data = ''
 #    print "(Offset: " + str(self.seekOffset) + ", Size: " + str(self.readOffset) + ")"
     
-    with open(self.possibleMatchPath, 'rb+') as possibleMatchedFile:
+    with open(self.possibleMatchPath, 'rb') as possibleMatchedFile:
       possibleMatchedFile.seek(self.seekOffset)
       data = possibleMatchedFile.read(self.readOffset)
     
