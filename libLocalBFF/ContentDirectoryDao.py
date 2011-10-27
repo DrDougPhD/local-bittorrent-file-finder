@@ -4,8 +4,12 @@ import logging
 
 def getAllFilesInContentDirectory( contentDirectory ):
   fileInfoFromContentDirectory = []
+  
+  filesInContentDirectory = 0
+  
   for root, dirs, files in os.walk( contentDirectory ):
     for f in files:
+      filesInContentDirectory += 1
       filepath = os.path.join( os.path.abspath(root), f )
       
       if os.path.exists( filepath ):
@@ -24,6 +28,7 @@ def getAllFilesInContentDirectory( contentDirectory ):
 #      fileInfo = (unicode(absolutePath, errors='replace'), unicode(f, errors='replace'), filesize)
 #      fileInfoFromContentDirectory.append( fileInfo )
   
+  logging.debug("Total files in content directory -> " + str(filesInContentDirectory))
   dao = ContentDirectoryDao(files=fileInfoFromContentDirectory)
   
   return dao
@@ -50,9 +55,11 @@ class ContentDirectoryDao:
     cursor = self.db.cursor()
     cursor.execute("select absolute_path, filename from warez where size = ?", (size,))
     filesWithSpecifiedSize = cursor.fetchall()
-        
+    
+    logging.debug("All files of size " + str(size) + " bytes -> " + str(len(filesWithSpecifiedSize)))
     filenames = []
     for fileInfoRow in filesWithSpecifiedSize:
+      logging.debug("File: " + filepath)
       fileDirectory = fileInfoRow[0]
       filename = fileInfoRow[1]
       filepath = os.path.join(fileDirectory, filename)

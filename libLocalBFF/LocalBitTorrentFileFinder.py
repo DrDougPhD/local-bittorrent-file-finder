@@ -15,16 +15,16 @@ class LocalBitTorrentFileFinder:
     logging.info("Stage 1: Processing metainfo file...")
     self.metafile = BitTorrentMetafile.getMetafileFromPath(self.metafilePath)
     
-    logging.debug("Number of Files:\t" + str(self.metafile.numberOfFiles))
-    logging.debug("Payload size:\t\t" + str(self.metafile.payloadSize))
-    logging.debug("Number of Pieces:\t" + str(self.metafile.numberOfPieces))
-    logging.debug("Piece size:\t\t" + str(self.metafile.pieceSize))
-    logging.debug("Final piece size:\t" + str(self.metafile.finalPieceSize))
+    logging.debug("Number of Files: " + str(self.metafile.numberOfFiles))
+    logging.debug("Payload size: " + str(self.metafile.payloadSize))
+    logging.debug("Number of Pieces: " + str(self.metafile.numberOfPieces))
+    logging.debug("Piece size: " + str(self.metafile.pieceSize))
+    logging.debug("Final piece size: " + str(self.metafile.finalPieceSize))
     
     logging.debug("File descriptions")
     for f in self.metafile.files:
-      logging.debug("Path:\t"+ f.path)
-      logging.debug("Size:\t"+ str(f.size))
+      logging.debug("Path: "+ f.getPathFromMetafile())
+      logging.debug("Size: "+ str(f.size))
   
   def connectFilesInMetafileToPossibleMatchesInContentDirectory(self):
     logging.info("Stage 3: Finding all file system files that match by size...")
@@ -34,7 +34,7 @@ class LocalBitTorrentFileFinder:
     self.files = self.metafile.files
     
     for payloadFile in self.files:
-      logging.debug("File: " + payloadFile.path)
+      logging.debug("File: " + payloadFile.getPathFromMetafile())
       logging.debug("Size: " + str(payloadFile.size))
 
       payloadFile.possibleMatches = self.dao.getAllFilesOfSize( payloadFile.size )

@@ -18,6 +18,7 @@ service.positivelyMatchFilesInMetafileToPossibleMatches()
 
 for matchedFile in service.files:
   output = ""
+  metafilePayloadFilePath = matchedFile.getPathFromMetafile()
   
   if matchedFile.status == 'NOT_CHECKED':
     output = "File not checked"
@@ -26,4 +27,4 @@ for matchedFile in service.files:
   elif matchedFile.status == 'CHECKED_WITH_NO_MATCH':
     output = "No matches found"
   
-  print matchedFile.getPathFromMetafile() + "\t->\t" + output
+  print metafilePayloadFilePath + "\t->\t" + output
