@@ -7,7 +7,7 @@ def getAllFilesInContentDirectory( contentDirectory ):
   
   filesInContentDirectory = 0
   
-  for root, dirs, files in os.walk( contentDirectory ):
+  for root, dirs, files in os.walk( contentDirectory, onerror=errorEncounteredWhileWalking ):
     for f in files:
       filesInContentDirectory += 1
       filepath = os.path.join( os.path.abspath(root), f )
@@ -32,6 +32,9 @@ def getAllFilesInContentDirectory( contentDirectory ):
   dao = ContentDirectoryDao(files=fileInfoFromContentDirectory)
   
   return dao
+
+def errorEncounteredWhileWalking( error ):
+  raise error
 
 class ContentDirectoryDao:
   def __init__(self, files=None):
