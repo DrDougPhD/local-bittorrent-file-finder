@@ -6,11 +6,11 @@ def getPayloadFilesFromMetafileDict(metafileDict):
   payloadDirectory = metafileDict['info']['name']
   
   if utils.isSingleFileMetafile(metafileDict):
-    path = payloadDirectory
+    filename = payloadDirectory
     size = metafileDict['info']['length']
     streamOffset = 0
     
-    files.append( PayloadFile(path=path, size=size, streamOffset=streamOffset) )
+    files.append( PayloadFile(path="", filename=filename, size=size, streamOffset=streamOffset) )
   
   else:
     numberOfFiles = len(metafileDict['info']['files'])
