@@ -1,10 +1,8 @@
 import sys
-import logging
 from libLocalBFF.LocalBitTorrentFileFinder import LocalBitTorrentFileFinder
 
 metafilePath = sys.argv[1]
 contentDirectory = sys.argv[2]
-logging.basicConfig(filename='ex.log',level=logging.DEBUG)
 
 service = LocalBitTorrentFileFinder( metafilePath=metafilePath, contentDirectory=contentDirectory )
 

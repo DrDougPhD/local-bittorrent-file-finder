@@ -1,6 +1,5 @@
 import BitTorrentMetafile
 import ContentDirectoryDao
-import logging
 
 class LocalBitTorrentFileFinder:
   def __init__(self, metafilePath=None, contentDirectory=None):
@@ -12,39 +11,39 @@ class LocalBitTorrentFileFinder:
     self.files = None
   
   def processMetafile(self):
-    logging.info("Stage 1: Processing metainfo file...")
+    print("Stage 1: Processing metainfo file...")
     self.metafile = BitTorrentMetafile.getMetafileFromPath(self.metafilePath)
     
-    logging.debug("Number of Files: " + str(self.metafile.numberOfFiles))
-    logging.debug("Payload size: " + str(self.metafile.payloadSize))
-    logging.debug("Number of Pieces: " + str(self.metafile.numberOfPieces))
-    logging.debug("Piece size: " + str(self.metafile.pieceSize))
-    logging.debug("Final piece size: " + str(self.metafile.finalPieceSize))
+    print("Number of Files: " + str(self.metafile.numberOfFiles))
+    print("Payload size: " + str(self.metafile.payloadSize))
+    print("Number of Pieces: " + str(self.metafile.numberOfPieces))
+    print("Piece size: " + str(self.metafile.pieceSize))
+    print("Final piece size: " + str(self.metafile.finalPieceSize))
     
-    logging.debug("File descriptions")
+    print("File descriptions")
     for f in self.metafile.files:
-      logging.debug("Path: "+ f.getPathFromMetafile())
-      logging.debug("Size: "+ str(f.size))
+      print("Path: "+ f.getPathFromMetafile())
+      print("Size: "+ str(f.size))
   
   def connectFilesInMetafileToPossibleMatchesInContentDirectory(self):
-    logging.info("Stage 3: Finding all file system files that match by size...")
+    print("Stage 3: Finding all file system files that match by size...")
     if self.dao == None:
       self.gatherAllFilesFromContentDirectory()
     
     self.files = self.metafile.files
     
     for payloadFile in self.files:
-      logging.debug("File: " + payloadFile.getPathFromMetafile())
-      logging.debug("Size: " + str(payloadFile.size))
+      print("File: " + payloadFile.getPathFromMetafile())
+      print("Size: " + str(payloadFile.size))
 
       payloadFile.possibleMatches = self.dao.getAllFilesOfSize( payloadFile.size )
-      logging.debug("Possible matches: " + str(len(payloadFile.possibleMatches)))
+      print("Possible matches: " + str(len(payloadFile.possibleMatches)))
       
   def gatherAllFilesFromContentDirectory(self):
-    logging.info("Stage 2: Walking content directory...")
+    print("Stage 2: Walking content directory...")
     self.dao = ContentDirectoryDao.getAllFilesInContentDirectory(self.contentDirectory)
   
   def positivelyMatchFilesInMetafileToPossibleMatches(self):
-    logging.info("Stage 4: Matching files in the file system to files in metafile...")
+    print("Stage 4: Matching files in the file system to files in metafile...")
     for piece in self.metafile.pieces:
       piece.findMatch()

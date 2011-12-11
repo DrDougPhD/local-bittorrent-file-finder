@@ -1,6 +1,5 @@
 import os
 import sqlite3
-import logging
 
 def getAllFilesInContentDirectory( contentDirectory ):
   fileInfoFromContentDirectory = []
@@ -19,16 +18,9 @@ def getAllFilesInContentDirectory( contentDirectory ):
         fileInfo = (unicode(absolutePath, errors='replace'), unicode(f, errors='replace'), filesize)
         fileInfoFromContentDirectory.append( fileInfo )
       else:
-        logging.error("Problem with accessing file -> " + filepath)
+        print("Problem with accessing file -> " + filepath)
       
-      # Errors if the file is a broken link.
-#      filesize = os.path.getsize( filepath )
-#      absolutePath = os.path.abspath( root )
-#      
-#      fileInfo = (unicode(absolutePath, errors='replace'), unicode(f, errors='replace'), filesize)
-#      fileInfoFromContentDirectory.append( fileInfo )
-  
-  logging.debug("Total files in content directory -> " + str(filesInContentDirectory))
+  print("Total files in content directory -> " + str(filesInContentDirectory))
   dao = ContentDirectoryDao(files=fileInfoFromContentDirectory)
   
   return dao
@@ -59,13 +51,20 @@ class ContentDirectoryDao:
     cursor.execute("select absolute_path, filename from warez where size = ?", (size,))
     filesWithSpecifiedSize = cursor.fetchall()
     
-    logging.debug("All files of size " + str(size) + " bytes -> " + str(len(filesWithSpecifiedSize)))
+    print("All files of size " + str(size) + " bytes -> " + str(len(filesWithSpecifiedSize)))
     filenames = []
     for fileInfoRow in filesWithSpecifiedSize:
       fileDirectory = fileInfoRow[0]
       filename = fileInfoRow[1]
       filepath = os.path.join(fileDirectory, filename)
-      logging.debug("File: " + filepath)
-      filenames.append( filepath )
+
+      if os.access(filepath, os.R_OK):
+        print "File added: " + filepath
+        filenames.append( filepath )
+      else:
+        print "Cannot read file due to permissions error, ignoring:"
+        print "  '" + filepath + "'"
+        print "To fix this problem, perhaps execute the following command:"
+        print " # chmod +r '" + filepath + "'"
     
     return filenames
