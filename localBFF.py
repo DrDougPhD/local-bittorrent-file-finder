@@ -1,8 +1,8 @@
 import sys
 from libLocalBFF.LocalBitTorrentFileFinder import LocalBitTorrentFileFinder
 
-metafilePath = sys.argv[1]
-contentDirectory = sys.argv[2]
+metafilePath = sys.argv[1].decode('utf-8')
+contentDirectory = sys.argv[2].decode('utf-8')
 
 service = LocalBitTorrentFileFinder( metafilePath=metafilePath, contentDirectory=contentDirectory )
 

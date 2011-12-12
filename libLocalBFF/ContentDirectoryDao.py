@@ -15,7 +15,7 @@ def getAllFilesInContentDirectory( contentDirectory ):
         filesize = os.path.getsize( filepath )
         absolutePath = os.path.abspath( root )
         
-        fileInfo = (unicode(absolutePath, errors='replace'), unicode(f, errors='replace'), filesize)
+        fileInfo = (absolutePath, f, filesize)
         fileInfoFromContentDirectory.append( fileInfo )
       else:
         print("Problem with accessing file -> " + filepath)
