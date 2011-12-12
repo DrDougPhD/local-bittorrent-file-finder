@@ -3,7 +3,7 @@ import PayloadFile
 import PayloadPiece
 
 def getMetafileFromPath( metafilePath ):
-  with open( metafilePath, 'rb+' ) as metafile:
+  with open( metafilePath, 'rb' ) as metafile:
     bencodedData = metafile.read()
   
   return getMetafileFromBencodedData( bencodedData )

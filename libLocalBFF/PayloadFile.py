@@ -3,7 +3,7 @@ import os
 
 def getPayloadFilesFromMetafileDict(metafileDict):
   files = []
-  payloadDirectory = metafileDict['info']['name']
+  payloadDirectory = metafileDict['info']['name'].decode('utf-8')
   
   if utils.isSingleFileMetafile(metafileDict):
     filename = payloadDirectory
@@ -19,7 +19,7 @@ def getPayloadFilesFromMetafileDict(metafileDict):
     for i in range(0, numberOfFiles):
       currentFile = metafileDict['info']['files'][i]
       path = os.path.join(payloadDirectory, *currentFile['path'][:-1])
-      filename = currentFile['path'][-1]
+      filename = currentFile['path'][-1].decode('utf-8')
 #      path = payloadDirectory + '/' + '/'.join(currentFile['path'])
       size = currentFile['length']
       index = i
