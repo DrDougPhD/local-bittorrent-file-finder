@@ -26,7 +26,11 @@ def getAllFilesInContentDirectory( contentDirectory ):
   return dao
 
 def errorEncounteredWhileWalking( error ):
-  raise error
+  print "Error accessing path:"
+  print "  '" + error.filename + "'"
+  print error
+  print "To fix this problem, perhaps execute the following command:"
+  print " # chmod -R +rx '" + error.filename + "'"
 
 class ContentDirectoryDao:
   def __init__(self, files=None):
