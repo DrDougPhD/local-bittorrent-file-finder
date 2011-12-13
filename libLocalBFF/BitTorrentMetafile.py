@@ -1,18 +1,44 @@
+import logging
+import utils
+import os
 from bencode import bencode
 import PayloadFile
 import PayloadPiece
 
+module_logger = logging.getLogger('localBFF.libLocalBFF.BitTorrentMetafile')
+
 def getMetafileFromPath( metafilePath ):
-  with open( metafilePath, 'rb' ) as metafile:
-    bencodedData = metafile.read()
-  
-  return getMetafileFromBencodedData( bencodedData )
+  module_logger.info('Metafile: ' + metafilePath)
+
+  try:
+    with open( metafilePath, 'rb' ) as metafile:
+      module_logger.debug('Metafile is readible')
+      bencodedData = metafile.read()
+    return getMetafileFromBencodedData( bencodedData )
+
+  except IOError as e:
+    module_logger.critical('Metafile is not readible, aborting program.')
+    module_logger.critical('Perhaps change the file permissions on "' + metafilePath + '"?')
+    module_logger.critical(' # chmod +r "' + metafilePath + '"')
+    raise e
+#  except:
+#    module_logger.critical('Something unexpected happened when attempting to read the provided metafile, aborting program.')
+#    module_logger.critical('File stats: '+ str(os.stat(metafilePath)))
+#    raise e
 
 def getMetafileFromBencodedData( bencodedData ):
+  module_logger.debug("Decoding metafile into python dictionary")
   metainfoDict = bencode.bdecode( bencodedData )
+
+  prunedMetainfoDict = utils.prunedMetainfoDict(metainfoDict)
+
+  module_logger.debug('Decoded metainfo content:')
+  module_logger.debug(prunedMetainfoDict)
+
   return getMetafileFromDict( metainfoDict )
 
 def getMetafileFromDict( metafileDict ):
+  module_logger.debug("Converting metafile dictionary to BitTorrentMetafile object")
   files = PayloadFile.getPayloadFilesFromMetafileDict( metafileDict )
   pieces = PayloadPiece.getPiecesFromMetafileDict( metafileDict )
   pieceSize = PayloadPiece.getPieceSizeFromDict(metafileDict)

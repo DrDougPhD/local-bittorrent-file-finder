@@ -1,16 +1,20 @@
 import itertools
 from hashlib import sha1
+import logging
 
 class AllContributingFilesToPiece:
   def __init__(self, listOfContributingFiles=None):
     self.listOfContributingFiles = listOfContributingFiles
     self.combinationProducesPositiveHashMatch = None
+    self.logger = logging.getLogger("localBFF.libLocalBFF.AllContributingFilesToPiece")
   
   def addContributingFile(self, newFile):
     if self.listOfContributingFiles == None:
       self.listOfContributingFiles = []
     
     self.listOfContributingFiles.append(newFile)
+    self.logger.debug("File contributing to piece:")
+    self.logger.debug(newFile)
   
   def getNumberOfFiles(self):
     return len(self.listOfContributingFiles)
@@ -18,30 +22,26 @@ class AllContributingFilesToPiece:
   def findCombinationThatMatchesReferenceHash(self, hash):
     cartesianProductOfPossibleFilePathMatches = self.buildCartesianProductOfPossibleFilePathMatches()
     
-#    print "Processing through all possible file path combinations..."
-#    print "Worst-case scenario of all combinations to process: " + str( self.getCardinalityOfCartesianProductOfAllPossibleCombinations() )
-#    print "Files contributing to piece: " + str( self.getNumberOfFiles() )
+    self.logger.debug("Processing through all possible file path combinations...")
+    self.logger.debug("Worst-case scenario of all combinations to process: " + str( self.getCardinalityOfCartesianProductOfAllPossibleCombinations() ))
+    self.logger.debug("Files contributing to piece: " + str( self.getNumberOfFiles() ))
     
     for combination in cartesianProductOfPossibleFilePathMatches:
-#      print "Checking combination... "
-#      print combination
+      self.logger.debug("Checking combination... ")
+      self.logger.debug(combination)
       self.applyCombinationToContributingFiles(combination)
       data = self.getData()
-#      print "Size of data:\t" + str(len(data))
-#      print "~"*40
-#      print "Computed hash:\t" + sha1(data).digest()
-#      print "Reference hash:\t" + hash
-#      print "~"*40
+      self.logger.debug("Size of data:\t" + str(len(data)))
       computedHash = sha1(data).digest()
       
-      self.combinationProducesPositiveHashMatch = computedHash == hash
+      self.combinationProducesPositiveHashMatch = (computedHash == hash)
       
       if self.combinationProducesPositiveHashMatch:
-#        print "Combination found!"
-#        print "#"*40
+        self.logger.debug("Combination found!")
         self.updateReferenceFilesWithAppropriateMatchedPaths()
         break
-#      print "#"*40
+      else:
+        self.logger.debug("Combination does not match.")
      
     self.updateStatusOfReferenceFiles()
   
@@ -50,8 +50,8 @@ class AllContributingFilesToPiece:
     for contributingFile in self.listOfContributingFiles:
       listOfListOfFilePaths.append(contributingFile.getAllPossibleFilePaths())
     
-#    print "All possible combinations: "
-#    print listOfListOfFilePaths
+    self.logger.debug("All possible combinations: ")
+    self.logger.debug(listOfListOfFilePaths)
     
     cartesianProduct = itertools.product(*listOfListOfFilePaths)
     return cartesianProduct
@@ -65,15 +65,15 @@ class AllContributingFilesToPiece:
   
   def applyCombinationToContributingFiles(self, combination):
     for path, contributingFile in zip(combination, self.listOfContributingFiles):
-#      print "Applying possible path to file..."
-#      print "Metafile Path: " +contributingFile.referenceFile.path
-#      print "Possible match Path: " + path
+      self.logger.debug("Applying possible path to file...")
+      self.logger.debug("Metafile Path: " +contributingFile.referenceFile.getPathFromMetafile())
+      self.logger.debug("Possible match Path: " + path)
       contributingFile.possibleMatchPath = path
   
   def getData(self):
     data = ''
     for contributingFile in self.listOfContributingFiles:
-#      print "Getting data from file: " + contributingFile.possibleMatchPath
+      self.logger.debug("Getting data from file: " + contributingFile.possibleMatchPath)
       data += contributingFile.getData()
     
     return data

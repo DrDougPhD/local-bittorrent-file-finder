@@ -1,11 +1,15 @@
 import os
 import sqlite3
+import logging
+
+module_logger = logging.getLogger('localBFF.libLocalBFF.ContentDirectoryDao')
 
 def getAllFilesInContentDirectory( contentDirectory ):
   fileInfoFromContentDirectory = []
   
   filesInContentDirectory = 0
   
+  module_logger.debug("Collecting all files in content directory: '" + contentDirectory + "'")
   for root, dirs, files in os.walk( contentDirectory, onerror=errorEncounteredWhileWalking ):
     for f in files:
       filesInContentDirectory += 1
@@ -18,24 +22,26 @@ def getAllFilesInContentDirectory( contentDirectory ):
         fileInfo = (absolutePath, f, filesize)
         fileInfoFromContentDirectory.append( fileInfo )
       else:
-        print("Problem with accessing file -> " + filepath)
+        module_logger.warning("Problem with accessing file -> " + filepath)
       
-  print("Total files in content directory -> " + str(filesInContentDirectory))
+  module_logger.debug("Total files in content directory -> " + str(filesInContentDirectory))
   dao = ContentDirectoryDao(files=fileInfoFromContentDirectory)
   
   return dao
 
 def errorEncounteredWhileWalking( error ):
-  print "Error accessing path:"
-  print "  '" + error.filename + "'"
-  print error
-  print "To fix this problem, perhaps execute the following command:"
-  print " # chmod -R +rx '" + error.filename + "'"
+  module_logger.warning("Error accessing path: '" + error.filename + "'")
+  module_logger.warning(error)
+  module_logger.warning("To fix this problem, perhaps execute the following command:")
+  module_logger.warning("# chmod -R +rx '" + error.filename + "'")
 
 class ContentDirectoryDao:
   def __init__(self, files=None):
     self.db = sqlite3.connect(":memory:")
-    
+
+    self.logger = logging.getLogger('localBFF.libLocalBFF.ContentDirectoryDao.ContentDirectoryDao')
+    self.logger.debug("Creating sqlite3 db in memory")
+
     cursor = self.db.cursor()
     cursor.execute('''
       create table warez(
@@ -47,15 +53,18 @@ class ContentDirectoryDao:
     self.db.commit()
     
     if files:
+      self.logger.debug("Inserting files into database")
       self.db.executemany("insert into warez values (?,?,?)", files)
       self.db.commit()
+    else:
+      self.logger.warning("No files found.")
   
   def getAllFilesOfSize(self, size):
     cursor = self.db.cursor()
     cursor.execute("select absolute_path, filename from warez where size = ?", (size,))
     filesWithSpecifiedSize = cursor.fetchall()
     
-    print("All files of size " + str(size) + " bytes -> " + str(len(filesWithSpecifiedSize)))
+    self.logger.debug("All files of size " + str(size) + " bytes -> " + str(len(filesWithSpecifiedSize)))
     filenames = []
     for fileInfoRow in filesWithSpecifiedSize:
       fileDirectory = fileInfoRow[0]
@@ -63,12 +72,11 @@ class ContentDirectoryDao:
       filepath = os.path.join(fileDirectory, filename)
 
       if os.access(filepath, os.R_OK):
-        print "File added: " + filepath
+        self.logger.debug("File added: " + filepath)
         filenames.append( filepath )
       else:
-        print "Cannot read file due to permissions error, ignoring:"
-        print "  '" + filepath + "'"
-        print "To fix this problem, perhaps execute the following command:"
-        print " # chmod +r '" + filepath + "'"
+        self.logger.warning("Cannot read file due to permissions error, ignoring: '" + filepath + "'")
+        self.logger.warning("To fix this problem, perhaps execute the following command:")
+        self.logger.warning("# chmod +r '" + filepath + "'")
     
     return filenames
