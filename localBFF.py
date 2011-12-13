@@ -28,9 +28,6 @@ console_loglevel_num = getattr(logging, console_loglevel.upper(), None)
 file_loglevel = args.file_verbosity
 file_loglevel_num = getattr(logging, file_loglevel.upper(), None)
 
-# assuming loglevel is bound to the string value obtained from the
-# command line argument. Convert to upper case to allow the user to
-# specify --log=DEBUG or --log=debug
 if not isinstance(console_loglevel_num, int):
   raise ValueError('Invalid console log level: %s' % console_loglevel)
 if not isinstance(file_loglevel_num, int):
