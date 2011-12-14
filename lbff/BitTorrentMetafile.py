@@ -1,7 +1,7 @@
 import logging
 import utils
 import os
-from bencode import bencode
+import bencode
 import PayloadFile
 import PayloadPiece
 
