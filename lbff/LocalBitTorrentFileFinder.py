@@ -7,32 +7,24 @@ class LocalBitTorrentFileFinder:
     self.metafilePath = metafilePath
     self.contentDirectory = contentDirectory
     self.logger = logging.getLogger(__name__)
+    self.logger.info("LocalBitTorrentFileFinder initialized")
+    self.logger.info("  Metafile path     => " + metafilePath)
+    self.logger.info("  Content directory => " + contentDirectory)
     
     self.metafile = None
     self.dao = None
     self.files = None
   
   def processMetafile(self):
-    self.logger.info("Stage 1: Processing metainfo file...")
+    self.logger.info("\nStage 1: Processing metainfo file\n---------------------------------")
     self.metafile = BitTorrentMetafile.getMetafileFromPath(self.metafilePath)
-    
-    self.logger.debug("Number of Files: " + str(self.metafile.numberOfFiles))
-    self.logger.debug("Payload size: " + str(self.metafile.payloadSize))
-    self.logger.debug("Number of Pieces: " + str(self.metafile.numberOfPieces))
-    self.logger.debug("Piece size: " + str(self.metafile.pieceSize))
-    self.logger.debug("Final piece size: " + str(self.metafile.finalPieceSize))
-    
-    self.logger.debug("File descriptions:")
-    for f in self.metafile.files:
-      self.logger.debug("Path: "+ f.getPathFromMetafile())
-      self.logger.debug("Size: "+ str(f.size))
   
   def gatherAllFilesFromContentDirectory(self):
-    self.logger.info("Stage 2: Walking content directory...")
+    self.logger.info("\nStage 2: Walking content directory\n----------------------------------")
     self.dao = ContentDirectoryDao.getAllFilesInContentDirectory(self.contentDirectory)
  
   def connectFilesInMetafileToPossibleMatchesInContentDirectory(self):
-    self.logger.info("Stage 3: Finding all file system files that match by size...")
+    self.logger.info("\nStage 3: Finding all file system files that match by size\n---------------------------------------------------------")
     if self.dao == None:
       self.gatherAllFilesFromContentDirectory()
     
@@ -46,6 +38,6 @@ class LocalBitTorrentFileFinder:
       
   
   def positivelyMatchFilesInMetafileToPossibleMatches(self):
-    self.logger.info("Stage 4: Matching files in the file system to files in metafile...")
+    self.logger.info("\nStage 4: Matching files in the file system to files in metafile\n---------------------------------------------------------------")
     for piece in self.metafile.pieces:
       piece.findMatch()

@@ -4,16 +4,16 @@ import os
 import bencode
 import PayloadFile
 import PayloadPiece
+import json
 
 module_logger = logging.getLogger(__name__)
 
 def getMetafileFromPath( metafilePath ):
-  module_logger.info('Metafile: ' + metafilePath)
-
+  module_logger.info("Loading metafile from URI " + metafilePath)
   try:
     with open( metafilePath, 'rb' ) as metafile:
-      module_logger.debug('Metafile is readible')
       bencodedData = metafile.read()
+      module_logger.debug("File read successfully")
     return getMetafileFromBencodedData( bencodedData )
 
   except IOError as e:
@@ -21,19 +21,14 @@ def getMetafileFromPath( metafilePath ):
     module_logger.critical('Perhaps change the file permissions on "' + metafilePath + '"?')
     module_logger.critical(' # chmod +r "' + metafilePath + '"')
     raise e
-#  except:
-#    module_logger.critical('Something unexpected happened when attempting to read the provided metafile, aborting program.')
-#    module_logger.critical('File stats: '+ str(os.stat(metafilePath)))
-#    raise e
 
 def getMetafileFromBencodedData( bencodedData ):
   module_logger.debug("Decoding metafile into python dictionary")
   metainfoDict = bencode.bdecode( bencodedData )
 
   prunedMetainfoDict = utils.prunedMetainfoDict(metainfoDict)
-
-  module_logger.debug('Decoded metainfo content:')
-  module_logger.debug(prunedMetainfoDict)
+  module_logger.debug('Decoded metainfo content =>\n' +
+    json.dumps(prunedMetainfoDict, indent=2, ensure_ascii=False))
 
   return getMetafileFromDict( metainfoDict )
 
@@ -46,7 +41,14 @@ def getMetafileFromDict( metafileDict ):
   numberOfPieces = PayloadPiece.getNumberOfPiecesFromDict(metafileDict)
   payloadSize = PayloadPiece.getPayloadSizeFromMetafileDict( metafileDict )
   
-  metafile = BitTorrentMetafile(files=files, pieces=pieces, pieceSize=pieceSize, finalPieceSize=finalPieceSize, numberOfPieces=numberOfPieces, payloadSize=payloadSize)
+  metafile = BitTorrentMetafile(
+    files=files,
+    pieces=pieces,
+    pieceSize=pieceSize, 
+    finalPieceSize=finalPieceSize, 
+    numberOfPieces=numberOfPieces, 
+    payloadSize=payloadSize
+  )
   
   return metafile
 
@@ -63,3 +65,9 @@ class BitTorrentMetafile:
     
     for piece in self.pieces:
       piece.setContributingFilesFromAllFiles(self.files)
+
+  def __repr__(self):
+    return self.__str__()
+
+  def __str__(self):
+    return "BitTorrent metafile"

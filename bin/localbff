@@ -4,6 +4,9 @@ import logging
 import argparse
 from lbff.LocalBitTorrentFileFinder import LocalBitTorrentFileFinder
 
+__version__ = "0.2.0"
+__project__ = "localbff " + __version__
+
 parser = argparse.ArgumentParser(description='Find the local files that are described in a BitTorrent metafile.')
 parser.add_argument('-v', '--verbosity',
   help="level of console logging",
@@ -47,7 +50,9 @@ console.setFormatter(formatter)
 
 cli_logger = logging.getLogger()
 cli_logger.addHandler(console)
-
+cli_logger.info(__project__)
+cli_logger.debug(" $ " + " ".join(sys.argv))
+cli_logger.info("="*len(__project__))
 service = LocalBitTorrentFileFinder( metafilePath=metafilePath, contentDirectory=contentDirectory )
 
 service.processMetafile()
@@ -69,4 +74,4 @@ for matchedFile in service.files:
   elif matchedFile.status == 'CHECKED_WITH_NO_MATCH':
     output = "No matches found"
   
-  print metafilePayloadFilePath + "\t->\t" + output
+  cli_logger.info(metafilePayloadFilePath + "\t->\t" + output)
