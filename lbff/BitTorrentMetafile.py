@@ -5,7 +5,7 @@ import bencode
 import PayloadFile
 import PayloadPiece
 
-module_logger = logging.getLogger('localBFF.libLocalBFF.BitTorrentMetafile')
+module_logger = logging.getLogger(__name__)
 
 def getMetafileFromPath( metafilePath ):
   module_logger.info('Metafile: ' + metafilePath)

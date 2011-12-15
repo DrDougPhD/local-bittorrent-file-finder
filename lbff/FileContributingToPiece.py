@@ -4,7 +4,7 @@ from utils import fileBeginsBeforePieceAndEndsInsidePiece
 from utils import fileBeginsInsidePieceAndEndsAfterPieceEnds
 from utils import fileIsCompletelyHeldInsidePiece
 
-module_logger = logging.getLogger("localBFF.libLocalBFF.FileContributingToPiece")
+module_logger = logging.getLogger(__name__)
 
 def getFromMetafilePieceAndFileObjects(piece, file):
   byteInWhichFileEndsInPiece = None
@@ -42,7 +42,7 @@ class FileContributingToPiece:
     self.referenceFile = referenceFile
     self.possibleMatchPath = possibleMatchPath
 
-    self.logger = logging.getLogger("localBFF.libLocalBFF.FileContributingToPiece.FileContributingToPiece")
+    self.logger = logging.getLogger(__name__)
     self.logger.debug(self)
 
 

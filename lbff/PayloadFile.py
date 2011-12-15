@@ -2,7 +2,7 @@ import utils
 import os
 import logging
 
-module_logger = logging.getLogger('localBFF.libLocalBFF.PayloadFile')
+module_logger = logging.getLogger(__name__)
 
 def getPayloadFilesFromMetafileDict(metafileDict):
   files = []
@@ -48,7 +48,7 @@ class PayloadFile:
     self.matchedFilePath = None
     self.status = "NOT_CHECKED"
 
-    self.logger = logging.getLogger('localBFF.libLocalBFF.PayloadFile.PayloadFile')
+    self.logger = logging.getLogger(__name__)
     self.logger.debug(self)
   
   def __repr__(self):

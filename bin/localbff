@@ -44,7 +44,9 @@ console = logging.StreamHandler()
 console.setLevel(console_loglevel_num)
 formatter = logging.Formatter('%(message)s')
 console.setFormatter(formatter)
-logging.getLogger('localBFF').addHandler(console)
+
+cli_logger = logging.getLogger()
+cli_logger.addHandler(console)
 
 service = LocalBitTorrentFileFinder( metafilePath=metafilePath, contentDirectory=contentDirectory )
 

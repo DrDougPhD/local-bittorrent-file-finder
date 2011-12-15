@@ -6,7 +6,7 @@ class AllContributingFilesToPiece:
   def __init__(self, listOfContributingFiles=None):
     self.listOfContributingFiles = listOfContributingFiles
     self.combinationProducesPositiveHashMatch = None
-    self.logger = logging.getLogger("localBFF.libLocalBFF.AllContributingFilesToPiece")
+    self.logger = logging.getLogger(__name__)
   
   def addContributingFile(self, newFile):
     if self.listOfContributingFiles == None:

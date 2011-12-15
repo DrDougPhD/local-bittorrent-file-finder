@@ -2,7 +2,7 @@ import os
 import sqlite3
 import logging
 
-module_logger = logging.getLogger('localBFF.libLocalBFF.ContentDirectoryDao')
+module_logger = logging.getLogger(__name__)
 
 def getAllFilesInContentDirectory( contentDirectory ):
   fileInfoFromContentDirectory = []
@@ -39,7 +39,7 @@ class ContentDirectoryDao:
   def __init__(self, files=None):
     self.db = sqlite3.connect(":memory:")
 
-    self.logger = logging.getLogger('localBFF.libLocalBFF.ContentDirectoryDao.ContentDirectoryDao')
+    self.logger = logging.getLogger(__name__)
     self.logger.debug("Creating sqlite3 db in memory")
 
     cursor = self.db.cursor()

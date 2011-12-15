@@ -6,7 +6,7 @@ class LocalBitTorrentFileFinder:
   def __init__(self, metafilePath=None, contentDirectory=None):
     self.metafilePath = metafilePath
     self.contentDirectory = contentDirectory
-    self.logger = logging.getLogger('localBFF.libLocalBFF.LocalBitTorrentFileFinder')
+    self.logger = logging.getLogger(__name__)
     
     self.metafile = None
     self.dao = None

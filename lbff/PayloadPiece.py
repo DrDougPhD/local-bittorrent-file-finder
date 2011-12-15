@@ -3,7 +3,7 @@ import logging
 import FileContributingToPiece
 from AllContributingFilesToPiece import AllContributingFilesToPiece
 
-module_logger = logging.getLogger('localBFF.libLocalBFF.PayloadPiece')
+module_logger = logging.getLogger(__name__)
 
 def getPiecesFromMetafileDict( metafileDict ):
   payloadSize = getPayloadSizeFromMetafileDict(metafileDict)
@@ -65,7 +65,7 @@ class PayloadPiece:
     self.index = index
     self.contributingFiles = AllContributingFilesToPiece()
 
-    self.logger = logging.getLogger('localBFF.libLocalBFF.PayloadPiece.PayloadPiece')
+    self.logger = logging.getLogger(__name__)
     self.logger.debug(self)
   
   def __repr__(self):
