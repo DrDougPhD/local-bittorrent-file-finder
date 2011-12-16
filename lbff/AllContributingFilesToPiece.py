@@ -1,4 +1,5 @@
 import itertools
+import utils
 from hashlib import sha1
 import logging
 
@@ -31,7 +32,7 @@ class AllContributingFilesToPiece:
       self.logger.debug("      Building up piece from possible file combination")
       data = self.getData()
       computedHash = sha1(data).digest()
-      self.logger.debug("      Computed hash for data => " + "NOT_PRINTABLE")
+      self.logger.debug("      Computed hash for data => " + utils.binToBase64(computedHash))
       
       self.combinationProducesPositiveHashMatch = (computedHash == hash)
       

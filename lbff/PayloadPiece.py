@@ -2,7 +2,6 @@ import utils
 import logging
 import FileContributingToPiece
 from AllContributingFilesToPiece import AllContributingFilesToPiece
-import binascii
 
 module_logger = logging.getLogger(__name__)
 
@@ -79,6 +78,7 @@ class PayloadPiece:
     self.streamOffset = streamOffset
     self.endingOffset = streamOffset+size
     self.hash = hash
+    self.b64_hash = utils.binToBase64(hash)
     self.index = index
     self.contributingFiles = AllContributingFilesToPiece()
     self.isVerified = False
@@ -90,7 +90,7 @@ class PayloadPiece:
 
   def __str__(self):
     output = "PayloadPiece #" + str(self.index) + ":(" + str(self.streamOffset) + "B, " + str(self.endingOffset) + "B) "
-    output += "(HASH=" + binascii.b2a_base64(self.hash)[:-1] + ")"
+    output += "(HASH=" + self.b64_hash + ")"
     return output
   
   def setContributingFilesFromAllFiles(self, allFiles):

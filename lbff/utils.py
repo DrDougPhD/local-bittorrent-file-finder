@@ -1,5 +1,6 @@
 import copy
 import os
+from binascii import b2a_base64
 
 def isSingleFileMetafile( metafileDict ):
   return 'length' in metafileDict['info'].keys()
@@ -32,3 +33,6 @@ def prunedMetainfoDict(metainfoDict):
 
 def isFileReadible(path):
   return os.access(path, os.R_OK)
+
+def binToBase64(binary):
+ return b2a_base64(binary)[:-1]
