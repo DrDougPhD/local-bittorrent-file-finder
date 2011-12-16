@@ -9,7 +9,7 @@ def getAllFilesInContentDirectory( contentDirectory ):
   
   filesInContentDirectory = 0
   
-  module_logger.debug("Collecting all files in content directory: '" + contentDirectory + "'")
+  module_logger.debug("Collecting all files in content directory => " + contentDirectory)
   for root, dirs, files in os.walk( contentDirectory, onerror=errorEncounteredWhileWalking ):
     for f in files:
       filesInContentDirectory += 1
@@ -22,11 +22,12 @@ def getAllFilesInContentDirectory( contentDirectory ):
         fileInfo = (absolutePath, f, filesize)
         fileInfoFromContentDirectory.append( fileInfo )
       else:
-        module_logger.warning("Problem with accessing file -> " + filepath)
+        module_logger.warning("  Problem with accessing file => " + filepath)
       
-  module_logger.debug("Total files in content directory -> " + str(filesInContentDirectory))
+  module_logger.debug("Total files in content directory => " + str(filesInContentDirectory))
   dao = ContentDirectoryDao(files=fileInfoFromContentDirectory)
-  
+
+  module_logger.debug("Content directory walking complete!")
   return dao
 
 def errorEncounteredWhileWalking( error ):
@@ -64,7 +65,7 @@ class ContentDirectoryDao:
     cursor.execute("select absolute_path, filename from warez where size = ?", (size,))
     filesWithSpecifiedSize = cursor.fetchall()
     
-    self.logger.debug("All files of size " + str(size) + " bytes -> " + str(len(filesWithSpecifiedSize)))
+    self.logger.debug("Getting all files of size " + str(size) + " bytes => " + str(len(filesWithSpecifiedSize)))
     filenames = []
     for fileInfoRow in filesWithSpecifiedSize:
       fileDirectory = fileInfoRow[0]
@@ -72,11 +73,11 @@ class ContentDirectoryDao:
       filepath = os.path.join(fileDirectory, filename)
 
       if os.access(filepath, os.R_OK):
-        self.logger.debug("File added: " + filepath)
+        self.logger.debug("  File added => " + filepath)
         filenames.append( filepath )
       else:
-        self.logger.warning("Cannot read file due to permissions error, ignoring: '" + filepath + "'")
-        self.logger.warning("To fix this problem, perhaps execute the following command:")
-        self.logger.warning("# chmod +r '" + filepath + "'")
+        self.logger.warning("  Cannot read file due to permissions error, ignoring: '" + filepath + "'")
+        self.logger.warning("  To fix this problem, perhaps execute the following command:")
+        self.logger.warning("   # chmod +r '" + filepath + "'")
     
     return filenames

@@ -9,30 +9,32 @@ module_logger = logging.getLogger(__name__)
 def getFromMetafilePieceAndFileObjects(piece, file):
   byteInWhichFileEndsInPiece = None
   byteInWhichFileBeginsInPiece = None
-  module_logger.debug("Checking to see if file contributes piece:")
-  module_logger.debug("  File: " + file.__str__())
-  module_logger.debug("  Piece: " + piece.__str__())
+  module_logger.debug("How does the file contribute to piece?")
+  module_logger.debug("  " + file.__str__())
+  module_logger.debug("  " + piece.__str__())
   
   if pieceOnlyHasOneFile(piece, file):
-    module_logger.debug("  Status: Piece only has one file")
+    module_logger.debug("  Status => Piece only has one file")
     byteInWhichFileBeginsInPiece = piece.streamOffset - file.streamOffset
     byteInWhichFileEndsInPiece = piece.size
   elif fileBeginsBeforePieceAndEndsInsidePiece(piece, file):
-    module_logger.debug("  Status: File begins before piece and ends inside piece")
+    module_logger.debug("  Status => File begins before piece and ends inside piece")
     byteInWhichFileBeginsInPiece = piece.streamOffset - file.streamOffset
     byteInWhichFileEndsInPiece = file.endingOffset - piece.streamOffset
   elif fileBeginsInsidePieceAndEndsAfterPieceEnds(piece, file):
-    module_logger.debug("  Status: File begins inside of piece and ends after piece ends")
+    module_logger.debug("  Status => File begins inside of piece and ends after piece ends")
     byteInWhichFileBeginsInPiece = 0
     byteInWhichFileEndsInPiece = piece.endingOffset - file.streamOffset
   elif fileIsCompletelyHeldInsidePiece(piece, file):
-    module_logger.debug("  Status: Entire file is held within piece")
+    module_logger.debug("  Status => Entire file is held within piece")
     byteInWhichFileBeginsInPiece = 0
     byteInWhichFileEndsInPiece = file.size
   else:
     raise Exception
   
   fcp = FileContributingToPiece(seek=byteInWhichFileBeginsInPiece, read=byteInWhichFileEndsInPiece, referenceFile=file)
+
+  module_logger.debug("FileContributingToPiece building complete!")
   return fcp
 
 class FileContributingToPiece:
@@ -43,16 +45,14 @@ class FileContributingToPiece:
     self.possibleMatchPath = possibleMatchPath
 
     self.logger = logging.getLogger(__name__)
-    self.logger.debug(self)
-
-
+  
   def __repr__(self):
     return self.__str__()
 
   def __str__(self):
-    output = "FileContributingToPiece object\n"
-    output += "  Metafile info: " + self.referenceFile.__str__() + "\n"
-    output += "  File substream: (Seek=" + str(self.seekOffset) + "B, Read=" + str(self.readOffset) + "B)"
+    output = __name__
+    output += "\n  Metafile info: " + self.referenceFile.__str__()
+    output += "\n  File substream: (Seek=" + str(self.seekOffset) + "B, Read=" + str(self.readOffset) + "B)"
     if self.possibleMatchPath:
       output += "\n  Possible match path: " + self.possibleMatchPath
     return output
@@ -64,10 +64,7 @@ class FileContributingToPiece:
       return self.referenceFile.possibleMatches
   
   def getData(self):
-    self.logger.debug("Getting data from content file")
-    self.logger.debug(self)
     data = ''
-    
     with open(self.possibleMatchPath, 'rb') as possibleMatchedFile:
       possibleMatchedFile.seek(self.seekOffset)
       data = possibleMatchedFile.read(self.readOffset)
@@ -76,8 +73,8 @@ class FileContributingToPiece:
   
   def applyCurrentMatchPathToReferenceFileAsPositiveMatchPath(self):
     self.referenceFile.matchedFilePath = self.possibleMatchPath
-    self.logger.debug("Applying file path to FileContributingToPiece")
-    self.logger.debug(self)
+    self.logger.debug("Applying filepath to PayloadFile")
   
   def updateStatus(self, status):
+    self.logger.debug("Updating file status from " + self.referenceFile.status + " to " + status)
     self.referenceFile.status = status

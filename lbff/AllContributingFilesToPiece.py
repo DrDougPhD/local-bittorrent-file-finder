@@ -13,8 +13,6 @@ class AllContributingFilesToPiece:
       self.listOfContributingFiles = []
     
     self.listOfContributingFiles.append(newFile)
-    self.logger.debug("File contributing to piece:")
-    self.logger.debug(newFile)
   
   def getNumberOfFiles(self):
     return len(self.listOfContributingFiles)
@@ -23,25 +21,27 @@ class AllContributingFilesToPiece:
     cartesianProductOfPossibleFilePathMatches = self.buildCartesianProductOfPossibleFilePathMatches()
     
     self.logger.debug("Processing through all possible file path combinations...")
-    self.logger.debug("Worst-case scenario of all combinations to process: " + str( self.getCardinalityOfCartesianProductOfAllPossibleCombinations() ))
-    self.logger.debug("Files contributing to piece: " + str( self.getNumberOfFiles() ))
+    self.logger.debug("  Worst-case scenario of all combinations to process: " + str( self.getCardinalityOfCartesianProductOfAllPossibleCombinations() ))
+    self.logger.debug("  Files contributing to piece => " + str( self.getNumberOfFiles() ))
     
     for combination in cartesianProductOfPossibleFilePathMatches:
-      self.logger.debug("Checking combination... ")
-      self.logger.debug(combination)
+      self.logger.debug("    Checking combination => " + "\n      ".join(combination) )
       self.applyCombinationToContributingFiles(combination)
+
+      self.logger.debug("      Building up piece from possible file combination")
       data = self.getData()
-      self.logger.debug("Size of data:\t" + str(len(data)))
       computedHash = sha1(data).digest()
+      self.logger.debug("      Computed hash for data => " + "NOT_PRINTABLE")
       
       self.combinationProducesPositiveHashMatch = (computedHash == hash)
       
       if self.combinationProducesPositiveHashMatch:
-        self.logger.debug("Combination found!")
+        self.logger.debug("      Combination found! Ending search now.")
         self.updateReferenceFilesWithAppropriateMatchedPaths()
         break
       else:
-        self.logger.debug("Combination does not match.")
+        self.logger.debug("      Combination does not match :( moving on to next combination")
+        self.logger.debug("~"*80)
      
     self.updateStatusOfReferenceFiles()
   
@@ -49,9 +49,6 @@ class AllContributingFilesToPiece:
     listOfListOfFilePaths = []
     for contributingFile in self.listOfContributingFiles:
       listOfListOfFilePaths.append(contributingFile.getAllPossibleFilePaths())
-    
-    self.logger.debug("All possible combinations: ")
-    self.logger.debug(listOfListOfFilePaths)
     
     cartesianProduct = itertools.product(*listOfListOfFilePaths)
     return cartesianProduct
@@ -65,17 +62,12 @@ class AllContributingFilesToPiece:
   
   def applyCombinationToContributingFiles(self, combination):
     for path, contributingFile in zip(combination, self.listOfContributingFiles):
-      self.logger.debug("Applying possible path to file...")
-      self.logger.debug("Metafile Path: " +contributingFile.referenceFile.getPathFromMetafile())
-      self.logger.debug("Possible match Path: " + path)
       contributingFile.possibleMatchPath = path
   
   def getData(self):
     data = ''
     for contributingFile in self.listOfContributingFiles:
-      self.logger.debug("Getting data from file: " + contributingFile.possibleMatchPath)
       data += contributingFile.getData()
-    
     return data
   
   def updateReferenceFilesWithAppropriateMatchedPaths(self):
@@ -84,7 +76,6 @@ class AllContributingFilesToPiece:
   
   def updateStatusOfReferenceFiles(self):
     status = ''
-    
     if self.combinationProducesPositiveHashMatch:
       status = "MATCH_FOUND"
     else:

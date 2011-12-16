@@ -31,11 +31,14 @@ class LocalBitTorrentFileFinder:
     self.files = self.metafile.files
     
     for payloadFile in self.files:
-      self.logger.debug("Current file:")
-      self.logger.debug(payloadFile)
+      self.logger.debug("For " + payloadFile.__str__())
       payloadFile.possibleMatches = self.dao.getAllFilesOfSize( payloadFile.size )
-      self.logger.debug("Possible matches: " + str(len(payloadFile.possibleMatches)))
       
+      self.logger.debug("  Number of Possible matches => " + str(len(payloadFile.possibleMatches)))
+      self.logger.debug("  Possible file matches => " + "\n    ".join(payloadFile.possibleMatches))
+      self.logger.debug("~"*80)
+    
+    self.logger.debug("Filesize reduction of possible matches complete!")
   
   def positivelyMatchFilesInMetafileToPossibleMatches(self):
     self.logger.info("\nStage 4: Matching files in the file system to files in metafile\n---------------------------------------------------------------")

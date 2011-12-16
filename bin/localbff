@@ -38,7 +38,7 @@ if not isinstance(file_loglevel_num, int):
   raise ValueError('Invalid file log level: %s' % file_loglevel)
 
 logging.basicConfig( level=file_loglevel_num,
-  format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+  format='%(message)s',
   datefmt='%m-%d %H:%M',
   filename='/tmp/localBFF.log',
   filemode='w')
@@ -51,8 +51,8 @@ console.setFormatter(formatter)
 cli_logger = logging.getLogger()
 cli_logger.addHandler(console)
 cli_logger.info(__project__)
-cli_logger.debug(" $ " + " ".join(sys.argv))
 cli_logger.info("="*len(__project__))
+cli_logger.debug(" $ " + " ".join(sys.argv))
 service = LocalBitTorrentFileFinder( metafilePath=metafilePath, contentDirectory=contentDirectory )
 
 service.processMetafile()

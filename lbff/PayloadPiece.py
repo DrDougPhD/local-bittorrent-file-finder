@@ -2,31 +2,48 @@ import utils
 import logging
 import FileContributingToPiece
 from AllContributingFilesToPiece import AllContributingFilesToPiece
+import binascii
 
 module_logger = logging.getLogger(__name__)
 
-def getPiecesFromMetafileDict( metafileDict ):
+def getPiecesFromMetafileDict( metafileDict, files ):
+  module_logger.debug("Extracting piece information from metafile dictionary")
+
   payloadSize = getPayloadSizeFromMetafileDict(metafileDict)
-  module_logger.debug('Payload size: ' + str(payloadSize) + ' Bytes')
+  module_logger.debug('  Payload size => ' + str(payloadSize) + ' Bytes')
   
   hashes = getHashesFromMetafileDict(metafileDict)
   
   pieceSize = getPieceSizeFromDict(metafileDict)
+  module_logger.debug('  Piece size => ' + str(pieceSize) + " Bytes")
+
   finalPieceSize = getFinalPieceSizeFromDict(metafileDict)
+  module_logger.debug("  Final piece size => " + str(finalPieceSize) + " Bytes")
 
   pieces = []
   streamOffset = 0
   numberOfPieces = getNumberOfPiecesFromDict(metafileDict)
+  module_logger.debug("  Number of pieces => " + str(numberOfPieces))
 
-  module_logger.debug('Pieces: (' + str(numberOfPieces) + "x " + str(pieceSize) + "B) + " + str(finalPieceSize))
-  
+  module_logger.debug("  Initializing list of PayloadPieces")
   for pieceIndex in range(numberOfPieces-1):
-    pieces.append( PayloadPiece(size=pieceSize, hash=hashes[pieceIndex], streamOffset=streamOffset, index=pieceIndex+1) )
+    module_logger.debug("Constructing piece #" + str(pieceIndex+1))
+    piece = PayloadPiece(size=pieceSize, hash=hashes[pieceIndex], streamOffset=streamOffset, index=pieceIndex+1)
+    piece.setContributingFilesFromAllFiles(files)
+    module_logger.debug(piece.__str__())
+    
+    pieces.append(piece)
     streamOffset += pieceSize
+    module_logger.debug("~"*80)
 
+  module_logger.debug("Constructing piece #" + str(numberOfPieces))
   finalPiece = PayloadPiece(size=finalPieceSize, hash=hashes[-1], streamOffset=streamOffset, index=numberOfPieces)
+  finalPiece.setContributingFilesFromAllFiles(files)
+  module_logger.debug(finalPiece.__str__())
+
   pieces.append(finalPiece)
-  
+
+  module_logger.debug("Piece information decoding complete!")
   return pieces
 
 def getPayloadSizeFromMetafileDict( metafileDict ):
@@ -66,23 +83,25 @@ class PayloadPiece:
     self.contributingFiles = AllContributingFilesToPiece()
 
     self.logger = logging.getLogger(__name__)
-    self.logger.debug(self)
   
   def __repr__(self):
     return self.__str__()
 
   def __str__(self):
-    output = "Piece #" + str(self.index) + ":(" + str(self.streamOffset) + "B, " + str(self.endingOffset) + "B)"
+    output = "PayloadPiece #" + str(self.index) + ":(" + str(self.streamOffset) + "B, " + str(self.endingOffset) + "B) "
+    output += "(HASH=" + binascii.b2a_base64(self.hash)[:-1] + ")"
     return output
-     
   
-  def setContributingFilesFromAllFiles(self, allFiles):    
+  def setContributingFilesFromAllFiles(self, allFiles):
+    self.logger.debug("START: Finding all files contributing to " + self.__str__())
     for payloadFile in allFiles:
       if payloadFile.contributesTo(self):
         contributingFile = FileContributingToPiece.getFromMetafilePieceAndFileObjects(piece=self, file=payloadFile)
         self.contributingFiles.addContributingFile( contributingFile )
-  
+
+    self.logger.debug("END: Finding all files contributing to " + self.__str__())
+
   def findMatch(self):
-    self.logger.debug("Finding match for piece")
-    self.logger.debug(self)
+    self.logger.debug("Finding all matched files for " + self.__str__())
     self.contributingFiles.findCombinationThatMatchesReferenceHash( hash=self.hash )
+    self.logger.debug("~"*80)

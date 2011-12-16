@@ -35,7 +35,7 @@ def getMetafileFromBencodedData( bencodedData ):
 def getMetafileFromDict( metafileDict ):
   module_logger.debug("Converting metafile dictionary to BitTorrentMetafile object")
   files = PayloadFile.getPayloadFilesFromMetafileDict( metafileDict )
-  pieces = PayloadPiece.getPiecesFromMetafileDict( metafileDict )
+  pieces = PayloadPiece.getPiecesFromMetafileDict( metafileDict, files )
   pieceSize = PayloadPiece.getPieceSizeFromDict(metafileDict)
   finalPieceSize = PayloadPiece.getFinalPieceSizeFromDict(metafileDict)
   numberOfPieces = PayloadPiece.getNumberOfPiecesFromDict(metafileDict)
@@ -50,24 +50,39 @@ def getMetafileFromDict( metafileDict ):
     payloadSize=payloadSize
   )
   
+  module_logger.debug("Metafile decoding complete!") 
   return metafile
 
 class BitTorrentMetafile:
-  def __init__(self, files, pieces, pieceSize=None, finalPieceSize=None, numberOfPieces=None, payloadSize=None):
+  def __init__(self, files, pieces, pieceSize=None, finalPieceSize=None, numberOfPieces=None, payloadSize=None, tracker=""):
     self.files = files
+    self.numberOfFiles = len(files)
     self.pieces = pieces
     self.pieceSize = pieceSize
     self.finalPieceSize = finalPieceSize
     self.numberOfPieces = numberOfPieces
     self.payloadSize = payloadSize
-    
-    self.numberOfFiles = len(files)
-    
-    for piece in self.pieces:
-      piece.setContributingFilesFromAllFiles(self.files)
+    self.tracker = tracker
 
   def __repr__(self):
     return self.__str__()
 
   def __str__(self):
-    return "BitTorrent metafile"
+    output = u""
+    output += __name__ + "\n"
+    output += "Tracker => " + self.tracker + "\n"
+    output += "Payload size => " + str(self.payloadSize) + " Bytes\n"
+    output += "Number of files => " + str(self.numberOfFiles) + "\n"
+    
+    for f in self.files:
+      output += "  " + f.__str__() + "\n"
+    
+    output += "Number of pieces => " + str(self.numberOfPieces) + "\n"
+    output += "Piece size => " + str(self.pieceSize) + " Bytes\n"
+    output += "Final piece size => " + str(self.finalPieceSize) + " Bytes\n"
+
+    for p in self.pieces:
+      output += "  " + p.__str__() + "\n"
+    
+    return output
+
