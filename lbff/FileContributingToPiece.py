@@ -72,9 +72,16 @@ class FileContributingToPiece:
     return data
   
   def applyCurrentMatchPathToReferenceFileAsPositiveMatchPath(self):
+    self.logger.debug("Applying " + self.possibleMatchPath + " to " + self.referenceFile.__str__())
     self.referenceFile.matchedFilePath = self.possibleMatchPath
-    self.logger.debug("Applying filepath to PayloadFile")
   
   def updateStatus(self, status):
-    self.logger.debug("Updating file status from " + self.referenceFile.status + " to " + status)
-    self.referenceFile.status = status
+    if not self.referenceFile.status == "MATCH_FOUND":
+      self.logger.debug("Updating file status from " + self.referenceFile.status + " to " + status)
+      self.referenceFile.status = status
+    else:
+      self.logger.debug("A match has already been found for " + self.referenceFile.__str__())
+      self.logger.debug("Not updating status.")
+
+  def hasBeenMatched(self):
+    return (self.referenceFile.status == "MATCH_FOUND")

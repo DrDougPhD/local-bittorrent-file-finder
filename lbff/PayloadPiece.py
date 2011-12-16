@@ -102,6 +102,17 @@ class PayloadPiece:
     self.logger.debug("END: Finding all files contributing to " + self.__str__())
 
   def findMatch(self):
-    self.logger.debug("Finding all matched files for " + self.__str__())
-    self.contributingFiles.findCombinationThatMatchesReferenceHash( hash=self.hash )
+    if self.isVerifiable():
+      if not self.contributingFiles.haveBeenPositivelyMatched():
+        self.logger.debug("Finding all matched files for " + self.__str__())
+        self.contributingFiles.findCombinationThatMatchesReferenceHash( hash=self.hash )
+      else:
+        self.logger.debug("All contributing files have been verified for " + self.__str__())
+        self.logger.debug("Skipping verification.")
+    else:
+      self.contributingFiles.updateStatusOfReferenceFiles('UNVERIFIABLE')
+      self.logger.debug(self.__str__() + " is not verifiable :(")
     self.logger.debug("~"*80)
+
+  def isVerifiable(self):
+    return self.contributingFiles.doAllContributingFilesHaveAtLeastOnePossibleMatch()

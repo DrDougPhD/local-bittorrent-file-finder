@@ -68,10 +68,12 @@ for matchedFile in service.files:
   metafilePayloadFilePath = matchedFile.getPathFromMetafile()
   
   if matchedFile.status == 'NOT_CHECKED':
-    output = "File not checked"
+    output = "No file could be found"
   elif matchedFile.status == 'MATCH_FOUND':
     output = matchedFile.getMatchedPathFromContentDirectory()
   elif matchedFile.status == 'CHECKED_WITH_NO_MATCH':
     output = "No matches found"
+  elif matchedFile.status == 'UNVERIFIABLE':
+    output = "Impossible to verify file"
   
   cli_logger.info(metafilePayloadFilePath + "\t->\t" + output)

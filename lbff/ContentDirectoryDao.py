@@ -9,7 +9,7 @@ def getAllFilesInContentDirectory( contentDirectory ):
   
   filesInContentDirectory = 0
   
-  module_logger.debug("Collecting all files in content directory => " + contentDirectory)
+  module_logger.info("Collecting all files in content directory => " + contentDirectory)
   for root, dirs, files in os.walk( contentDirectory, onerror=errorEncounteredWhileWalking ):
     for f in files:
       filesInContentDirectory += 1
@@ -24,10 +24,10 @@ def getAllFilesInContentDirectory( contentDirectory ):
       else:
         module_logger.warning("  Problem with accessing file => " + filepath)
       
-  module_logger.debug("Total files in content directory => " + str(filesInContentDirectory))
+  module_logger.info("Total files in content directory => " + str(filesInContentDirectory))
   dao = ContentDirectoryDao(files=fileInfoFromContentDirectory)
 
-  module_logger.debug("Content directory walking complete!")
+  module_logger.info("Content directory walking complete!")
   return dao
 
 def errorEncounteredWhileWalking( error ):
@@ -58,7 +58,7 @@ class ContentDirectoryDao:
       self.db.executemany("insert into warez values (?,?,?)", files)
       self.db.commit()
     else:
-      self.logger.warning("No files found.")
+      self.logger.warning("No files found. No matches will be found D:")
   
   def getAllFilesOfSize(self, size):
     cursor = self.db.cursor()

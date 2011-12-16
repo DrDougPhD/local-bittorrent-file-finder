@@ -38,12 +38,12 @@ class AllContributingFilesToPiece:
       if self.combinationProducesPositiveHashMatch:
         self.logger.debug("      Combination found! Ending search now.")
         self.updateReferenceFilesWithAppropriateMatchedPaths()
+        self.updateStatusOfReferenceFiles("MATCH_FOUND")
         break
       else:
         self.logger.debug("      Combination does not match :( moving on to next combination")
         self.logger.debug("~"*80)
-     
-    self.updateStatusOfReferenceFiles()
+        self.updateStatusOfReferenceFiles("CHECKED_WITH_NO_MATCH")
   
   def buildCartesianProductOfPossibleFilePathMatches(self):
     listOfListOfFilePaths = []
@@ -74,12 +74,16 @@ class AllContributingFilesToPiece:
     for contributingFile in self.listOfContributingFiles:
       contributingFile.applyCurrentMatchPathToReferenceFileAsPositiveMatchPath()
   
-  def updateStatusOfReferenceFiles(self):
-    status = ''
-    if self.combinationProducesPositiveHashMatch:
-      status = "MATCH_FOUND"
-    else:
-      status = "CHECKED_WITH_NO_MATCH"
-    
+  def updateStatusOfReferenceFiles(self, status):
     for contributingFile in self.listOfContributingFiles:
       contributingFile.updateStatus(status)
+
+  def doAllContributingFilesHaveAtLeastOnePossibleMatch(self):
+    return (self.getCardinalityOfCartesianProductOfAllPossibleCombinations() > 0)
+
+  def haveBeenPositivelyMatched(self):
+    for contributingFile in self.listOfContributingFiles:
+      if not contributingFile.hasBeenMatched():
+        return False
+
+    return True
