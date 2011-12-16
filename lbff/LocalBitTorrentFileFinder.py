@@ -3,7 +3,7 @@ import ContentDirectoryDao
 import logging
 
 class LocalBitTorrentFileFinder:
-  def __init__(self, fastVerification, metafilePath=None, contentDirectory=None):
+  def __init__(self, fastVerification=False, metafilePath=None, contentDirectory=None):
     self.metafilePath = metafilePath
     self.contentDirectory = contentDirectory
     self.doFastVerification = fastVerification
