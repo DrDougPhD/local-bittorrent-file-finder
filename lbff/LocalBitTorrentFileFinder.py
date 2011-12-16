@@ -55,3 +55,10 @@ class LocalBitTorrentFileFinder:
         self.percentageMatched += newPercentageAdded
       self.logger.debug("~"*80)
     self.logger.info("Percentage of Metafile matched => " + str(self.percentageMatched) + "%")
+
+    for file in self.files:
+      self.logger.info("FILE METADATA => " + file.getPathFromMetafile())
+      self.logger.info(" STATUS       => " + file.status)
+      if file.status == "MATCH_FOUND":
+        self.logger.info(" MATCH PATH   => " + file.getMatchedPathFromContentDirectory())
+
