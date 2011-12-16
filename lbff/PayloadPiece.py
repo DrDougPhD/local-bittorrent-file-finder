@@ -81,6 +81,7 @@ class PayloadPiece:
     self.hash = hash
     self.index = index
     self.contributingFiles = AllContributingFilesToPiece()
+    self.isVerified = False
 
     self.logger = logging.getLogger(__name__)
   
@@ -101,18 +102,22 @@ class PayloadPiece:
 
     self.logger.debug("END: Finding all files contributing to " + self.__str__())
 
-  def findMatch(self):
+  def findMatch(self, fastVerification):
     if self.isVerifiable():
-      if not self.contributingFiles.haveBeenPositivelyMatched():
-        self.logger.debug("Finding all matched files for " + self.__str__())
-        self.contributingFiles.findCombinationThatMatchesReferenceHash( hash=self.hash )
-      else:
+      doNotContinueWithMatch = (
+        fastVerification and self.contributingFiles.haveBeenPositivelyMatched()
+      )
+      if doNotContinueWithMatch:
         self.logger.debug("All contributing files have been verified for " + self.__str__())
         self.logger.debug("Skipping verification.")
+        self.isVerified = True
+      else:
+        self.logger.debug("Finding all matched files for " + self.__str__())
+        self.contributingFiles.findCombinationThatMatchesReferenceHash( hash=self.hash )
+        self.isVerified = self.contributingFiles.combinationProducesPositiveHashMatch
     else:
       self.contributingFiles.updateStatusOfReferenceFiles('UNVERIFIABLE')
       self.logger.debug(self.__str__() + " is not verifiable :(")
-    self.logger.debug("~"*80)
 
   def isVerifiable(self):
     return self.contributingFiles.doAllContributingFilesHaveAtLeastOnePossibleMatch()

@@ -8,6 +8,11 @@ __version__ = "0.2.0"
 __project__ = "localbff " + __version__
 
 parser = argparse.ArgumentParser(description='Find the local files that are described in a BitTorrent metafile.')
+parser.add_argument('-q', '--quick-verification',
+  help="verify only the minimum number of pieces needed to verify files",
+  dest="quick_verification",
+  action="store_true",
+  default=False)
 parser.add_argument('-v', '--verbosity',
   help="level of console logging",
   dest='console_verbosity',
@@ -53,7 +58,10 @@ cli_logger.addHandler(console)
 cli_logger.info(__project__)
 cli_logger.info("="*len(__project__))
 cli_logger.debug(" $ " + " ".join(sys.argv))
-service = LocalBitTorrentFileFinder( metafilePath=metafilePath, contentDirectory=contentDirectory )
+service = LocalBitTorrentFileFinder( metafilePath=metafilePath,
+  contentDirectory=contentDirectory,
+  fastVerification=args.quick_verification
+)
 
 service.processMetafile()
 
