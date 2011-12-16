@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
   name='LocalBitTorrentFileFinder',
-  version='0.2.0',
+  version='0.3.0dev',
   packages=['lbff',],
   scripts=['bin/localbff',],
   author='torik',
@@ -11,8 +11,8 @@ setup(
   license='Python Software Foundation License',
   description='Find local files described in a BitTorrent metafile',
   long_description=open('README.txt').read(),
-  install_requires=[
-    "argparse >= 1.2.1",
-    "bencode == 1.0",
+  requires=[
+    "argparse (>=1.2.1)",
+    "bencode (==1.0)",
   ],
 )
