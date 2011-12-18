@@ -21,8 +21,9 @@ except ImportError as e:
   raise Exception("ABORTING")
 
 from lbff.LocalBitTorrentFileFinder import LocalBitTorrentFileFinder
+from lbff import ContentDirectoryDao
 
-__version__ = "0.2.2"
+__version__ = "0.2.3dev"
 __project__ = "localbff " + __version__
 
 parser = argparse.ArgumentParser(description='Find the local files that are described in a BitTorrent metafile.')
@@ -76,17 +77,16 @@ cli_logger.addHandler(console)
 cli_logger.info(__project__)
 cli_logger.info("="*len(__project__))
 cli_logger.debug(" $ " + " ".join(sys.argv))
+
+dao = ContentDirectoryDao.getAllFilesInContentDirectory(contentDirectory)
 service = LocalBitTorrentFileFinder( metafilePath=metafilePath,
   contentDirectory=contentDirectory,
-  fastVerification=args.quick_verification
+  fastVerification=args.quick_verification,
+  dao=dao
 )
 
 service.processMetafile()
-
-service.gatherAllFilesFromContentDirectory()
-
 service.connectFilesInMetafileToPossibleMatchesInContentDirectory()
-
 service.positivelyMatchFilesInMetafileToPossibleMatches()
 
 for matchedFile in service.files:

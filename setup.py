@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
   name='LocalBitTorrentFileFinder',
-  version='0.2.2',
+  version='0.2.3dev',
   packages=['lbff',],
   scripts=['bin/localbff',],
   author='torik',

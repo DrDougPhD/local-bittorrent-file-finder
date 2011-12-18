@@ -5,8 +5,11 @@ import logging
 module_logger = logging.getLogger(__name__)
 
 def getAllFilesInContentDirectory( contentDirectory ):
-  fileInfoFromContentDirectory = []
+  module_logger.info("""
+Walking content directory
+-------------------------""")
   
+  fileInfoFromContentDirectory = []
   filesInContentDirectory = 0
   
   module_logger.info("Collecting all files in content directory => " + contentDirectory)

@@ -3,7 +3,7 @@ import ContentDirectoryDao
 import logging
 
 class LocalBitTorrentFileFinder:
-  def __init__(self, fastVerification=False, metafilePath=None, contentDirectory=None):
+  def __init__(self, fastVerification=False, metafilePath=None, contentDirectory=None, dao=None):
     self.metafilePath = metafilePath
     self.contentDirectory = contentDirectory
     self.doFastVerification = fastVerification
@@ -15,20 +15,29 @@ class LocalBitTorrentFileFinder:
     self.logger.info("  Fast verification => " + str(fastVerification))
     
     self.metafile = None
-    self.dao = None
+    self.dao = dao
     self.files = None
     self.percentageMatched = 0.0
   
   def processMetafile(self):
-    self.logger.info("\nStage 1: Processing metainfo file\n---------------------------------")
+    self.logger.info("""
+Processing metainfo file
+------------------------""")
+    
     self.metafile = BitTorrentMetafile.getMetafileFromPath(self.metafilePath)
   
   def gatherAllFilesFromContentDirectory(self):
-    self.logger.info("\nStage 2: Walking content directory\n----------------------------------")
+    self.logger.info("""
+Walking content directory
+-------------------------""")
+    
     self.dao = ContentDirectoryDao.getAllFilesInContentDirectory(self.contentDirectory)
  
   def connectFilesInMetafileToPossibleMatchesInContentDirectory(self):
-    self.logger.info("\nStage 3: Finding all file system files that match by size\n---------------------------------------------------------")
+    self.logger.info("""
+Finding all file system files that match by size
+------------------------------------------------""")
+    
     if self.dao == None:
       self.gatherAllFilesFromContentDirectory()
     
@@ -45,8 +54,10 @@ class LocalBitTorrentFileFinder:
     self.logger.debug("Filesize-based match reduction of possible matches complete!")
   
   def positivelyMatchFilesInMetafileToPossibleMatches(self):
-    self.logger.info("\nStage 4: Matching files in the file system to files in metafile\n---------------------------------------------------------------")
-
+    self.logger.info("""
+Matching files in the file system to files in metafile
+------------------------------------------------------""")
+    
     for piece in self.metafile.pieces:
       piece.findMatch(fastVerification=self.doFastVerification)
       if piece.isVerified:
