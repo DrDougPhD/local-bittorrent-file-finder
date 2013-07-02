@@ -20,11 +20,10 @@ except ImportError as e:
   print "  # pip install bencode"
   raise Exception("ABORTING")
 
-from lbff.LocalBitTorrentFileFinder import LocalBitTorrentFileFinder
-from lbff import ContentDirectoryDao
-
-__version__ = "0.2.3dev"
-__project__ = "localbff " + __version__
+from localbff import metafile
+from localbff.localbff import LocalBitTorrentFileFinder
+from localbff import cache
+from localbff import __project__
 
 parser = argparse.ArgumentParser(description='Find the local files that are described in a BitTorrent metafile.')
 parser.add_argument('-q', '--quick-verification',
@@ -78,15 +77,20 @@ cli_logger.info(__project__)
 cli_logger.info("="*len(__project__))
 cli_logger.debug(" $ " + " ".join(sys.argv))
 
-dao = ContentDirectoryDao.getAllFilesInContentDirectory(contentDirectory)
-service = LocalBitTorrentFileFinder( metafilePath=metafilePath,
-  contentDirectory=contentDirectory,
-  fastVerification=args.quick_verification,
-  dao=dao
-)
+current_metafile = metafile.getMetafileFromPath(metafilePath)
+cache = cache.load(dirs=[contentDirectory])
+potentialMatches = []
+for f in current_metafile.files:
+  potentialMatches.append(cache.getAllFilesOfSize(f.size))
 
-service.processMetafile()
-service.connectFilesInMetafileToPossibleMatchesInContentDirectory()
+service = LocalBitTorrentFileFinder(
+  metafile=current_metafile,
+  fastVerification=args.quick_verification,
+)
+i = 0
+for f in potentialMatches:
+  service.connectPayloadFileToPotentialMatches(i, f)
+  i += 1
 service.positivelyMatchFilesInMetafileToPossibleMatches()
 
 for matchedFile in service.files:

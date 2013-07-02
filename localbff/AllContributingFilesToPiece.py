@@ -1,7 +1,7 @@
 import itertools
-import utils
 from hashlib import sha1
 import logging
+from utils import binToBase64
 
 class AllContributingFilesToPiece:
   def __init__(self, listOfContributingFiles=None):
@@ -22,8 +22,10 @@ class AllContributingFilesToPiece:
     cartesianProductOfPossibleFilePathMatches = self.buildCartesianProductOfPossibleFilePathMatches()
     
     self.logger.debug("Processing through all possible file path combinations...")
-    self.logger.debug("  Worst-case scenario of all combinations to process: " + str( self.getCardinalityOfCartesianProductOfAllPossibleCombinations() ))
-    self.logger.debug("  Files contributing to piece => " + str( self.getNumberOfFiles() ))
+    self.logger.debug("  Worst-case scenario of all combinations to process: {0}".format(
+      self.getCardinalityOfCartesianProductOfAllPossibleCombinations()
+    ))
+    self.logger.debug("  Files contributing to piece => {0}".format(self.getNumberOfFiles()))
     
     for combination in cartesianProductOfPossibleFilePathMatches:
       self.logger.debug("    Checking combination => " + "\n      ".join(combination) )
@@ -32,7 +34,7 @@ class AllContributingFilesToPiece:
       self.logger.debug("      Building up piece from possible file combination")
       data = self.getData()
       computedHash = sha1(data).digest()
-      self.logger.debug("      Computed hash for data => " + utils.binToBase64(computedHash))
+      self.logger.debug("      Computed hash for data => " + binToBase64(computedHash))
       
       self.combinationProducesPositiveHashMatch = (computedHash == hash)
       
@@ -88,3 +90,4 @@ class AllContributingFilesToPiece:
         return False
 
     return True
+

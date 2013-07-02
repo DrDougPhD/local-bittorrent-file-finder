@@ -1,9 +1,10 @@
-import utils
 import logging
-import FileContributingToPiece
+from utils import isSingleFileMetafile
+from utils import binToBase64
 from AllContributingFilesToPiece import AllContributingFilesToPiece
-
+from FileContributingToPiece import getFromMetafilePieceAndFileObjects
 module_logger = logging.getLogger(__name__)
+
 
 def getPiecesFromMetafileDict( metafileDict, files ):
   module_logger.debug("Extracting piece information from metafile dictionary")
@@ -46,7 +47,7 @@ def getPiecesFromMetafileDict( metafileDict, files ):
   return pieces
 
 def getPayloadSizeFromMetafileDict( metafileDict ):
-  if utils.isSingleFileMetafile(metafileDict):
+  if isSingleFileMetafile(metafileDict):
     return metafileDict['info']['length']
   
   else:
@@ -78,12 +79,12 @@ class PayloadPiece:
     self.streamOffset = streamOffset
     self.endingOffset = streamOffset+size
     self.hash = hash
-    self.b64_hash = utils.binToBase64(hash)
+    self.b64_hash = binToBase64(hash)
     self.index = index
     self.contributingFiles = AllContributingFilesToPiece()
     self.isVerified = False
 
-    self.logger = logging.getLogger(__name__)
+    self.logger = logging.getLogger('deluge.plugin.LocalBFF.common.PayloadPiece')
   
   def __repr__(self):
     return self.__str__()
@@ -97,7 +98,7 @@ class PayloadPiece:
     self.logger.debug("START: Finding all files contributing to " + self.__str__())
     for payloadFile in allFiles:
       if payloadFile.contributesTo(self):
-        contributingFile = FileContributingToPiece.getFromMetafilePieceAndFileObjects(piece=self, file=payloadFile)
+        contributingFile = getFromMetafilePieceAndFileObjects(piece=self, file=payloadFile)
         self.contributingFiles.addContributingFile( contributingFile )
 
     self.logger.debug("END: Finding all files contributing to " + self.__str__())
@@ -121,3 +122,4 @@ class PayloadPiece:
 
   def isVerifiable(self):
     return self.contributingFiles.doAllContributingFilesHaveAtLeastOnePossibleMatch()
+

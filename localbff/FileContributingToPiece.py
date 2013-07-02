@@ -1,17 +1,39 @@
 import logging
-from utils import pieceOnlyHasOneFile
-from utils import fileBeginsBeforePieceAndEndsInsidePiece
-from utils import fileBeginsInsidePieceAndEndsAfterPieceEnds
-from utils import fileIsCompletelyHeldInsidePiece
-
 module_logger = logging.getLogger(__name__)
+
+
+def pieceOnlyHasOneFile(piece, file):
+  fileBeginsBeforePieceBegins = file.streamOffset <= piece.streamOffset
+  fileEndsAfterPieceEnds = file.endingOffset >= piece.endingOffset
+  return fileBeginsBeforePieceBegins and fileEndsAfterPieceEnds
+
+
+def fileBeginsBeforePieceAndEndsInsidePiece(piece, file):
+  fileBeginsBeforePiece = file.streamOffset < piece.streamOffset
+  fileEndsInsidePiece = file.endingOffset > piece.streamOffset and file.endingOffset < piece.endingOffset
+  return fileBeginsBeforePiece and fileEndsInsidePiece
+
+
+def fileBeginsInsidePieceAndEndsAfterPieceEnds(piece, file):
+  fileBeginsInsidePiece = file.streamOffset > piece.streamOffset and file.streamOffset < piece.endingOffset
+  fileEndsAfterPieceEnds = file.endingOffset > piece.endingOffset
+  return fileBeginsInsidePiece and fileEndsAfterPieceEnds
+
+
+def fileIsCompletelyHeldInsidePiece(piece, file):
+  fileBeginsInsidePiece = file.streamOffset >= piece.streamOffset
+  fileEndsInsidePiece = file.endingOffset <= piece.endingOffset
+  return fileBeginsInsidePiece and fileEndsInsidePiece
+
+
+
 
 def getFromMetafilePieceAndFileObjects(piece, file):
   byteInWhichFileEndsInPiece = None
   byteInWhichFileBeginsInPiece = None
   module_logger.debug("How does the file contribute to piece?")
-  module_logger.debug("  " + file.__str__())
-  module_logger.debug("  " + piece.__str__())
+  module_logger.debug("  {0}".format(file))
+  module_logger.debug("  {0}".format(piece))
   
   if pieceOnlyHasOneFile(piece, file):
     module_logger.debug("  Status => Piece only has one file")
@@ -51,10 +73,10 @@ class FileContributingToPiece:
 
   def __str__(self):
     output = __name__
-    output += "\n  Metafile info: " + self.referenceFile.__str__()
-    output += "\n  File substream: (Seek=" + str(self.seekOffset) + "B, Read=" + str(self.readOffset) + "B)"
+    output += "\n  Metafile info: {0}".format(self.referenceFile)
+    output += "\n  File substream: (Seek={0}B, Read={1}B)".format(self.seekOffset, self.readOffset)
     if self.possibleMatchPath:
-      output += "\n  Possible match path: " + self.possibleMatchPath
+      output += "\n  Possible match path: {0}".format(self.possibleMatchPath)
     return output
   
   def getAllPossibleFilePaths(self):
@@ -72,16 +94,17 @@ class FileContributingToPiece:
     return data
   
   def applyCurrentMatchPathToReferenceFileAsPositiveMatchPath(self):
-    self.logger.debug("Applying " + self.possibleMatchPath + " to " + self.referenceFile.__str__())
+    self.logger.debug("Applying {0} to {1}".format(self.possibleMatchPath, self.referenceFile))
     self.referenceFile.matchedFilePath = self.possibleMatchPath
   
   def updateStatus(self, status):
     if not self.referenceFile.status == "MATCH_FOUND":
-      self.logger.debug("Updating file status from " + self.referenceFile.status + " to " + status)
+      self.logger.debug("Updating file status from {0} to {1}".format(self.referenceFile.status, status))
       self.referenceFile.status = status
     else:
-      self.logger.debug("A match has already been found for " + self.referenceFile.__str__())
+      self.logger.debug("A match has already been found for {0}".format(self.referenceFile))
       self.logger.debug("Not updating status.")
 
   def hasBeenMatched(self):
     return (self.referenceFile.status == "MATCH_FOUND")
+
