@@ -12,7 +12,7 @@ How to Use LocalBFF
 
 From the command line, call::
 
-  $ localbff /path/to/torrentFile.torrent /path/to/directory/you/suspect/files/to/be/stored/in/
+    $ localbff /path/to/torrentFile.torrent /path/to/directory/you/suspect/files/to/be/stored/in/
 
 Simply give it the directory where the files could be, and a .torrent file of interest. It'll tell you if it finds the files, and where they are located!
 
