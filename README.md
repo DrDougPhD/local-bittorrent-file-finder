@@ -5,7 +5,7 @@ Sometimes you rename files, or change the directory structure. Then, after a whi
 
 What do you do now? Well, if you believe "Sharing is Caring", you'll reseed those buggers soon.
 
-Local BitTorrent File Finder (**localbff**) is a command-line program intended to assist you in locating those lost files.
+Local BitTorrent File Finder (*localbff*) is a command-line program intended to assist you in locating those lost files.
 
 How to Use LocalBFF
 -------------------
@@ -19,4 +19,4 @@ Simply give it the directory where the files could be, and a .torrent file of in
 What LocalBFF won't do
 ----------------------
 
-It won't rename your files, and won't set them up for immediate re-seeding. lbff only provides you with the information for finding files that can be reseeded.
+It won't rename your files, and won't set them up for immediate re-seeding. LocalBFF only provides you with the information for finding files that can be reseeded.
