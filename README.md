@@ -20,5 +20,3 @@ What LocalBFF won't do
 ----------------------
 
 It won't rename your files, and won't set them up for immediate re-seeding. lbff only provides you with the information for finding files that can be reseeded.
-
-If you're interested in minimizing the amount of effort that is required to reseed your previously lost files, check out Allogamy for a GUI application or Putlog for a command line application.
